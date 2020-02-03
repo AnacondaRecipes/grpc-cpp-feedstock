@@ -5,7 +5,7 @@
 @rem library size (more than 100MB per .lib file).  Unsetting those flags
 @rem simply works.
 
-set CFLAGS=
+@rem set CFLAGS=
 set CXXFLAGS=
 
 mkdir build-cpp
@@ -16,13 +16,14 @@ cd build-cpp
 cmake ..  ^
       -GNinja ^
       -DCMAKE_BUILD_TYPE=Release ^
-      -DCMAKE_PREFIX_PATH=%CONDA_PREFIX% ^
-      -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% ^
+      -DCMAKE_PREFIX_PATH=%PREFIX% ^
+      -DCMAKE_INSTALL_PREFIX=%PREFIX% ^
       -DgRPC_CARES_PROVIDER="package" ^
       -DgRPC_GFLAGS_PROVIDER="package" ^
       -DgRPC_PROTOBUF_PROVIDER="package" ^
       -DgRPC_SSL_PROVIDER="package" ^
-      -DgRPC_ZLIB_PROVIDER="package"
+      -DgRPC_ZLIB_PROVIDER="package" ^
+      -DgRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN=OFF
 
 cmake --build . --config Release --target install
 

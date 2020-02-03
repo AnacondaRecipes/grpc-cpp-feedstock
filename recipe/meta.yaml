@@ -8,6 +8,9 @@ package:
 source:
   - url: https://github.com/grpc/grpc/archive/v{{ version }}.tar.gz
     sha256: 2fcb7f1ab160d6fd3aaade64520be3e5446fc4c6fa7ba6581afdc4e26094bd81
+    # patches:
+      # Building the Objective C plugin fails on Windows, skip it.
+      # - 0001-remove-objective-c-target.patch  # [win]
 
 build:
   number: 0
@@ -22,18 +25,19 @@ requirements:
     - {{ compiler('cxx') }}
     - cmake
     # `protoc` is also used for building
-    - libprotobuf
     - ninja
   host:
     - c-ares
     - gflags
-    - libprotobuf
+    - libprotobuf >=3.11
     - openssl
     - zlib
   run:
     # Need to pin libprotobuf to the same version used when building,
     # otherwise we may get a different SO ABI version.
     # For example 3.6.1 is ABI-incompatible with 3.6.0...
+    - c-ares
+    - gflags
     - {{ pin_compatible("libprotobuf", min_pin="x.x.x", max_pin="x.x.x") }}
     - zlib
 
