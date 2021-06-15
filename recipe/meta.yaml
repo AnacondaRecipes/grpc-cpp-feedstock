@@ -36,7 +36,7 @@ source:
   #   folder: third_party/re2
 
 build:
-  number: 4
+  number: 0
 {% if static_build == 'yes' %}
   ignore_run_exports:
     - abseil-cpp
