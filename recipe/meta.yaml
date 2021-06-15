@@ -33,9 +33,6 @@ source:
 
 build:
   number: 0
-  ignore_run_exports:
-    - c-ares
-    - openssl
   run_exports:
     - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
 
