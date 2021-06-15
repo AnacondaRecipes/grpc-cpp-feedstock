@@ -2,6 +2,12 @@
 
 set -ex
 
+if [[ "${target_platform}" == osx* ]]; then
+  export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=14"
+else
+  export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=17"
+fi
+
 if [[ "$CONDA_BUILD_CROSS_COMPILATION" == 1 ]]; then
 
     mkdir -p build-host
@@ -62,15 +68,9 @@ fi
 mkdir -p build-cpp
 pushd build-cpp
 
-if [[ ${STATIC_BUILD} == yes ]]; then
-  BUILD_SHARED_LIBS=OFF
-else
-  BUILD_SHARED_LIBS=ON
-fi
-
 cmake ${CMAKE_ARGS} ..  \
       -GNinja \
-      -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
+      -DBUILD_SHARED_LIBS=ON \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
       -DCMAKE_PREFIX_PATH=$PREFIX \
@@ -83,16 +83,7 @@ cmake ${CMAKE_ARGS} ..  \
       -DgRPC_ZLIB_PROVIDER="package" \
       -DgRPC_ABSL_PROVIDER="package" \
       -DgRPC_RE2_PROVIDER="package" \
-      -DCMAKE_AR=${AR} \
-      -DCMAKE_RANLIB=${RANLIB} \
-      -DCMAKE_VERBOSE_MAKEFILE=ON \
       -DProtobuf_PROTOC_EXECUTABLE=$BUILD_PREFIX/bin/protoc
 
-ninja install -v
-
-# These are in conflict with the re2 package.
-rm -rf ${PREFIX}/include/re2
-rm -rf ${PREFIX}/lib/libre2.a
-rm -rf ${PREFIX}/lib/pkgconfig/re2.pc
-
+ninja install
 popd

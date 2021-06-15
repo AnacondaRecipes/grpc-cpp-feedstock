@@ -1,6 +1,10 @@
 {% set name = "grpc-cpp" %}
 {% set version = "1.38.0" %}
 
+package:
+  name: {{ name | lower }}
+  version: {{ version }}
+
 # It is not currently possible to compile grpc-cpp on Windows in shared mode:
 # _h_env\Library\include\google/protobuf/io/coded_stream.h(1250):
 #   warning C4251: 'google::protobuf::io::CodedOutputStream::default_serialization_deterministic_': struct 'std::atomic<bool>'
@@ -9,7 +13,7 @@
 # .. and, considering that this constrains a lot of things like openssl, I have decided to unify to static builds on all platforms.
 # {% set static_build = 'yes' %}  # [win]
 # {% set static_build = 'no' %}  # [not win]
-{% set static_build = 'yes' %}
+{% set static_build = 'no' %}
 
 {% if static_build == 'yes' %}
 {% set libext = '.lib' %}  # [win]
@@ -20,47 +24,28 @@
 {% set libext = '.dylib' %}  # [osx]
 {% endif %}
 
-package:
-  name: {{ name | lower }}
-  version: {{ version }}
-
 source:
   url: https://github.com/grpc/grpc/archive/v{{ version }}.tar.gz
   sha256: abd9e52c69000f2c051761cfa1f12d52d8b7647b6c66828a91d462e796f2aede
   patches:
     - aarch64-tcp-header.patch  # [aarch64]
     - force-protoc-executable.patch
-  # You can use module version of re2 if you add this and chage build.sh:
-  # - git_url: https://github.com/google/re2
-  #   git_ref: aecba11114cf1fac5497aeb844b6966106de3eb6
-  #   folder: third_party/re2
 
 build:
   number: 0
-{% if static_build == 'yes' %}
   ignore_run_exports:
-    - abseil-cpp
     - c-ares
-    - re2
     - openssl
-    - zlib
-{% else %}
   run_exports:
     - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
-{% endif %}
-  script_env:
-    - STATIC_BUILD={{ static_build }}
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - m2-patch  # [win]
-    - patch  # [not win]
     - cmake
-    - pkg-config  # [unix]
     # `protoc` is also used for building
-    - libprotobuf =3.14
+    - libprotobuf
     - ninja
     # We need all host deps also in build for cross-compiling
     - abseil-cpp  # [build_platform != target_platform]
@@ -71,15 +56,11 @@ requirements:
   host:
     - abseil-cpp
     - c-ares
-    - libprotobuf =3.14
+    - libprotobuf
     - re2
     - openssl
     - zlib
   run:
-    # Need to pin libprotobuf to the same version used when building,
-    # otherwise we may get a different SO ABI version.
-    # For example 3.6.1 is ABI-incompatible with 3.6.0...
-    - {{ pin_compatible("libprotobuf", min_pin="x.x.x", max_pin="x.x.x") }}
     - zlib
 
 test:
@@ -120,4 +101,3 @@ extra:
     - pitrou
     - xhochy
     - wesm
-    - mingwandroid
