@@ -64,7 +64,7 @@ requirements:
     # `protoc` is also used for building
     - libprotobuf  # [not (osx and arm64)]
     - libprotobuf =3.17  # [osx and arm64]
-    #- ninja
+    - ninja
     # We need all host deps also in build for cross-compiling
     - abseil-cpp  # [build_platform != target_platform]
     - c-ares      # [build_platform != target_platform]
