@@ -36,7 +36,7 @@ source:
   #   folder: third_party/re2
 
 build:
-  number: 5
+  number: 0
 {% if static_build == 'yes' %}
   ignore_run_exports:
     - abseil-cpp
@@ -57,7 +57,7 @@ requirements:
     - {{ compiler('cxx') }}
     - m2-patch  # [win]
     - patch  # [not win]
-    - cmake
+    - cmake >=3.5.1
     - pkg-config  # [unix]
     # `protoc` is also used for building
     - libprotobuf  # [not (osx and arm64)]
