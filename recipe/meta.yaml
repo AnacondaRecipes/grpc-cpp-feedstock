@@ -6,10 +6,8 @@
 #   warning C4251: 'google::protobuf::io::CodedOutputStream::default_serialization_deterministic_': struct 'std::atomic<bool>'
 #   needs to have dll-interface to be used by clients of class 'google::protobuf::io::CodedOutputStream'
 # LINK : fatal error LNK1181: cannot open input file 'gpr.lib'
-# .. and, considering that this constrains a lot of things like openssl, I have decided to unify to static builds on all platforms.
-# {% set static_build = 'yes' %}  # [win]
-# {% set static_build = 'no' %}  # [not win]
-{% set static_build = 'yes' %}
+{% set static_build = 'yes' %}  # [win]
+{% set static_build = 'no' %}  # [not win]
 
 {% if static_build == 'yes' %}
 {% set libext = '.lib' %}  # [win]
