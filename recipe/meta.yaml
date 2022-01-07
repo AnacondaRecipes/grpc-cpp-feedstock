@@ -9,7 +9,7 @@
 # .. and, considering that this constrains a lot of things like openssl, I have decided to unify to static builds on all platforms.
 # {% set static_build = 'yes' %}  # [win]
 # {% set static_build = 'no' %}  # [not win]
-{% set static_build = 'no' %}
+{% set static_build = 'yes' %}
 
 {% if static_build == 'yes' %}
 {% set libext = '.lib' %}  # [win]
@@ -36,6 +36,7 @@ source:
 
 build:
   number: 5
+  skip: True  # [win32]
 {% if static_build == 'yes' %}
   ignore_run_exports:
     - abseil-cpp
@@ -60,7 +61,7 @@ requirements:
     - cmake >=3.5.1
     - pkg-config  # [unix]
     # `protoc` is also used for building
-    - libprotobuf
+    - libprotobuf >=3.19
     - ninja
     # We need all host deps also in build for cross-compiling
     - abseil-cpp  # [build_platform != target_platform]
@@ -71,7 +72,7 @@ requirements:
   host:
     - abseil-cpp
     - c-ares
-    - libprotobuf
+    - libprotobuf >=3.19
     - re2
     - openssl
     - zlib
