@@ -1,15 +1,13 @@
 {% set name = "grpc-cpp" %}
-{% set version = "1.39.0" %}
+{% set version = "1.43.0" %}
 
 # It is not currently possible to compile grpc-cpp on Windows in shared mode:
 # _h_env\Library\include\google/protobuf/io/coded_stream.h(1250):
 #   warning C4251: 'google::protobuf::io::CodedOutputStream::default_serialization_deterministic_': struct 'std::atomic<bool>'
 #   needs to have dll-interface to be used by clients of class 'google::protobuf::io::CodedOutputStream'
 # LINK : fatal error LNK1181: cannot open input file 'gpr.lib'
-# .. and, considering that this constrains a lot of things like openssl, I have decided to unify to static builds on all platforms.
-# {% set static_build = 'yes' %}  # [win]
-# {% set static_build = 'no' %}  # [not win]
-{% set static_build = 'yes' %}
+{% set static_build = 'yes' %}  # [win]
+{% set static_build = 'no' %}  # [not win]
 
 {% if static_build == 'yes' %}
 {% set libext = '.lib' %}  # [win]
@@ -26,7 +24,7 @@ package:
 
 source:
   url: https://github.com/grpc/grpc/archive/v{{ version }}.tar.gz
-  sha256: b16992aa1c949c10d5d5ce2a62f9d99fa7de77da2943e643fb66dcaf075826d6
+  sha256: 9647220c699cea4dafa92ec0917c25c7812be51a18143af047e20f3fb05adddc
   patches:
     - aarch64-tcp-header.patch  # [aarch64]
     - force-protoc-executable.patch
@@ -36,7 +34,8 @@ source:
   #   folder: third_party/re2
 
 build:
-  number: 5
+  number: 0
+  skip: True  # [win32]
 {% if static_build == 'yes' %}
   ignore_run_exports:
     - abseil-cpp
@@ -60,8 +59,7 @@ requirements:
     - cmake
     - pkg-config  # [unix]
     # `protoc` is also used for building
-    - libprotobuf  # [not (osx and arm64)]
-    - libprotobuf =3.17  # [osx and arm64]
+    - libprotobuf >=3.19
     - ninja
     # We need all host deps also in build for cross-compiling
     - abseil-cpp  # [build_platform != target_platform]
@@ -72,8 +70,7 @@ requirements:
   host:
     - abseil-cpp
     - c-ares
-    - libprotobuf  # [not (osx and arm64)]
-    - libprotobuf =3.17  # [osx and arm64]
+    - libprotobuf >=3.19
     - re2
     - openssl
     - zlib
@@ -83,6 +80,7 @@ requirements:
     # For example 3.6.1 is ABI-incompatible with 3.6.0...
     - {{ pin_compatible("libprotobuf", min_pin="x.x.x", max_pin="x.x.x") }}
     - zlib
+    - re2
 
 test:
   files:
