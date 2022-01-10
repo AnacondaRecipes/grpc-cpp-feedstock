@@ -80,6 +80,7 @@ requirements:
     # For example 3.6.1 is ABI-incompatible with 3.6.0...
     - {{ pin_compatible("libprotobuf", min_pin="x.x.x", max_pin="x.x.x") }}
     - zlib
+    - re2
 
 test:
   files:
