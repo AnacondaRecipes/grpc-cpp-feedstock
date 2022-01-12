@@ -34,7 +34,8 @@ source:
 
 build:
   number: 0
-  skip: True  # [win32]
+  # Anaconda's s390x does not contain depdendencies for abseil-cpp or re2, this package is skipped for s390x at this time.
+  skip: True  # [win32 or s390x]
 {% if static_build == 'yes' %}
   ignore_run_exports:
     - abseil-cpp
