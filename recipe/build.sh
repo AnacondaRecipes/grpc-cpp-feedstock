@@ -5,6 +5,11 @@ set -ex
 if [[ "${target_platform}" == osx* ]]; then
   export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=14"
 else
+  # In Linux, absl-cpp is built on all platforms with C++17's features
+  # enabled.  Specifically, absl::string_view is a typedef/alias of
+  # std::string_view. Calling a function that uses absl::string_view
+  # when the standard is below C++17 will result in a link time error
+  # (undefined reference).
   export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=17"
 fi
 
