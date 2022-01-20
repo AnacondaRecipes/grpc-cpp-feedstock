@@ -1,0 +1,14 @@
+# In Linux, absl-cpp is built on all platforms with C++17's features
+# enabled.  Specifically, absl::string_view is a typedef/alias of
+# std::string_view. Calling a function that uses absl::string_view
+# when the standard is below C++17 will result in a link time error
+# (undefined reference).
+#
+# gcc8's support for C++17 is still considered experimental, use a
+# newer version where available.
+c_compiler_version:    # [linux and not aarch64]
+- '9'                  # [linux and not aarch64 and not ppc64le]
+- '8'                  # [linux and ppc64le]
+cxx_compiler_version:  # [linux and not aarch64]
+- '9'                  # [linux and not aarch64 and not ppc64le]
+- '8'                  # [linux and ppc64le]
