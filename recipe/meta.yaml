@@ -40,7 +40,7 @@ build:
 {% if static_build == 'yes' %}
   ignore_run_exports:
     - abseil-cpp
-    - c-ares
+    - c-ares >=1.13
     - re2
     - openssl
     - zlib
@@ -64,13 +64,13 @@ requirements:
     - ninja
     # We need all host deps also in build for cross-compiling
     - abseil-cpp  # [build_platform != target_platform]
-    - c-ares      # [build_platform != target_platform]
+    - c-ares >=1.13     # [build_platform != target_platform]
     - re2         # [build_platform != target_platform]
     - openssl     # [build_platform != target_platform]
     - zlib        # [build_platform != target_platform]
   host:
     - abseil-cpp
-    - c-ares
+    - c-ares >=1.13
     - libprotobuf >=3.19
     - re2
     - openssl
