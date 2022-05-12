@@ -60,7 +60,7 @@ requirements:
     - cmake
     - pkg-config  # [unix]
     # `protoc` is also used for building
-    - libprotobuf >=3.19
+    - libprotobuf  # Use the version pinned in cbc.yaml
     - ninja
     # We need all host deps also in build for cross-compiling
     - abseil-cpp  # [build_platform != target_platform]
@@ -71,7 +71,7 @@ requirements:
   host:
     - abseil-cpp
     - c-ares
-    - libprotobuf >=3.19
+    - libprotobuf  # libprotobuf pins itself to x.x via run_exports
     - re2
     - openssl
     - zlib
