@@ -62,12 +62,6 @@ requirements:
     # `protoc` is also used for building
     - libprotobuf  # Use the version pinned in cbc.yaml
     - ninja
-    # We need all host deps also in build for cross-compiling
-    - abseil-cpp  # [build_platform != target_platform]
-    - c-ares      # [build_platform != target_platform]
-    - re2         # [build_platform != target_platform]
-    - openssl     # [build_platform != target_platform]
-    - zlib        # [build_platform != target_platform]
   host:
     - abseil-cpp
     - c-ares
