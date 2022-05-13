@@ -109,6 +109,7 @@ about:
     This package contains the gRPC C++ libraries and header files, as well
     as the code generation plugins.
   doc_url: https://grpc.io/docs/
+  doc_source_url: https://github.com/grpc/grpc/tree/master/doc
   dev_url: https://github.com/grpc/grpc
 
 extra:
