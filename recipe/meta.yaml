@@ -48,6 +48,8 @@ build:
   run_exports:
     - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
 {% endif %}
+  missing_dso_whitelist:
+    - '$RPATH/ld64.so.1'  # [s390x]
   script_env:
     - STATIC_BUILD={{ static_build }}
 
