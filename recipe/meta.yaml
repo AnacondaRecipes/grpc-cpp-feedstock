@@ -1,5 +1,5 @@
 {% set name = "grpc-cpp" %}
-{% set version = "1.43.0" %}
+{% set version = "1.46.1" %}
 
 # It is not currently possible to compile grpc-cpp on Windows in shared mode:
 # _h_env\Library\include\google/protobuf/io/coded_stream.h(1250):
@@ -24,7 +24,7 @@ package:
 
 source:
   url: https://github.com/grpc/grpc/archive/v{{ version }}.tar.gz
-  sha256: 9647220c699cea4dafa92ec0917c25c7812be51a18143af047e20f3fb05adddc
+  sha256: 291db3c4e030164421b89833ee761a2e6ca06b1d1f8e67953df762665d89439d
   patches:
     - force-protoc-executable.patch
   # You can use module version of re2 if you add this and chage build.sh:
@@ -36,7 +36,7 @@ build:
   number: 0
   # Anaconda's s390x does not contain depdendencies for abseil-cpp or re2, this package is skipped for s390x at this time.
   # Latest protobuf recipe skips win32, so this package does as well.
-  skip: True  # [win32 or s390x]
+  skip: true  # [win32]
 {% if static_build == 'yes' %}
   ignore_run_exports:
     - abseil-cpp
@@ -48,6 +48,8 @@ build:
   run_exports:
     - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
 {% endif %}
+  missing_dso_whitelist:
+    - '$RPATH/ld64.so.1'  # [s390x]
   script_env:
     - STATIC_BUILD={{ static_build }}
 
@@ -57,21 +59,15 @@ requirements:
     - {{ compiler('cxx') }}
     - m2-patch  # [win]
     - patch  # [not win]
-    - cmake
+    - cmake >=3.5.1
     - pkg-config  # [unix]
     # `protoc` is also used for building
-    - libprotobuf >=3.19
+    - libprotobuf  # Use the version pinned in cbc.yaml
     - ninja
-    # We need all host deps also in build for cross-compiling
-    - abseil-cpp  # [build_platform != target_platform]
-    - c-ares      # [build_platform != target_platform]
-    - re2         # [build_platform != target_platform]
-    - openssl     # [build_platform != target_platform]
-    - zlib        # [build_platform != target_platform]
   host:
     - abseil-cpp
     - c-ares
-    - libprotobuf >=3.19
+    - libprotobuf  # libprotobuf pins itself to x.x via run_exports
     - re2
     - openssl
     - zlib
@@ -115,6 +111,7 @@ about:
     This package contains the gRPC C++ libraries and header files, as well
     as the code generation plugins.
   doc_url: https://grpc.io/docs/
+  doc_source_url: https://github.com/grpc/grpc/tree/master/doc
   dev_url: https://github.com/grpc/grpc
 
 extra:
