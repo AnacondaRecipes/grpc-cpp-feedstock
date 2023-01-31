@@ -24,7 +24,7 @@ package:
 
 source:
   url: https://github.com/grpc/grpc/archive/v{{ version }}.tar.gz
-  sha256: a5069db33ba5b14064752d67949b2feeb1a99d73f393a4e94f8742ed770317a8
+  sha256: 291db3c4e030164421b89833ee761a2e6ca06b1d1f8e67953df762665d89439d
   patches:
     - force-protoc-executable.patch
   # You can use module version of re2 if you add this and chage build.sh:
