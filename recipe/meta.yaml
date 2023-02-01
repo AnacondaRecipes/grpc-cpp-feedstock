@@ -79,6 +79,8 @@ requirements:
 test:
   files:
     - tests/include/*
+  script_env:
+    - LIB_EXT={{libext}}
 
 about:
   home: https://grpc.io/
