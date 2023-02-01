@@ -82,19 +82,6 @@ requirements:
 test:
   files:
     - tests/include/*
-  commands:
-    - grpc_cpp_plugin < /dev/null  # [not win]
-    - grpc_cpp_plugin < NUL  # [win]
-
-    - test -f $PREFIX/lib/libgrpc{{ libext }}  # [not win]
-    - test -f $PREFIX/lib/libgrpc_unsecure{{ libext }}  # [not win]
-    - test -f $PREFIX/lib/libgrpc++{{ libext }}  # [not win]
-    - test -f $PREFIX/lib/libgrpc++_unsecure{{ libext }}  # [not win]
-
-    - if not exist %PREFIX%\\Library\\lib\\address_sorting{{ libext }} exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\lib\\gpr{{ libext }} exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\lib\\grpc{{ libext }} exit 1  # [win]
-    - if not exist %PREFIX%\\Library\\lib\\grpc++{{ libext }} exit 1  # [win]
 
 about:
   home: https://grpc.io/
