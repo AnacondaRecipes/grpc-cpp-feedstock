@@ -49,6 +49,7 @@ build:
     - '$RPATH/ld64.so.1'  # [s390x]
   script_env:
     - STATIC_BUILD={{ static_build }}
+    - LIB_EXT={{libext}}
 
 requirements:
   build:
@@ -79,8 +80,6 @@ requirements:
 test:
   files:
     - tests/include/*
-  script_env:
-    - LIB_EXT={{libext}}
 
 about:
   home: https://grpc.io/
