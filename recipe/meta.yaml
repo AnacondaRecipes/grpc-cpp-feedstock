@@ -45,17 +45,8 @@ outputs:
       script_env:
         - STATIC_BUILD={{ static_build }}
         - LIB_EXT={{libext}}
-{% if static_build == 'yes' %}
-      ignore_run_exports:
-        - abseil-cpp
-        - c-ares
-        - re2
-        - openssl
-        - zlib
-{% else %}
       run_exports:
         - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
-{% endif %}
     requirements:
       build:
         - {{ compiler('c') }}
