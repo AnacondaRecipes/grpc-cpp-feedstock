@@ -26,11 +26,11 @@ source:
   url: https://github.com/{{ name }}/{{ name }}/archive/v{{ version }}.tar.gz
   sha256: bdb8e98145469d58c69ab9f2c9e0bd838c2836a99b5760bc0ebf658623768f52
   patches:
-    - force-protoc-executable.patch
-    - 0001-Monkey-patch-distutils.ccompiler.spawn-to-elide-std-.patch
-    - 0002-windows-ssl-lib-names.patch
-    - 0001-fix-win-commands.patch
-    - 0003-Link-against-grpc.patch
+    - patches/force-protoc-executable.patch
+    - patches/0001-Monkey-patch-distutils.ccompiler.spawn-to-elide-std-.patch
+    - patches/0002-windows-ssl-lib-names.patch
+    - patches/0001-fix-win-commands.patch
+    - patches/0003-Link-against-grpc.patch
 
 build:
   number: 0
