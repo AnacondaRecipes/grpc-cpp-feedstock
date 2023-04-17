@@ -110,6 +110,14 @@ outputs:
         - pthread-stubs     # [linux]
         - setuptools
         - wheel >=0.29
+{% if static_build == 'yes' %}
+        - abseil-cpp 20211102.0
+        - c-ares 1.19.0
+        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
+        - re2 2022.04.01
+        - openssl
+        - zlib
+{% endif %}
       run:
         - python
         - {{ pin_subpackage('grpc-cpp', exact=True) }}
