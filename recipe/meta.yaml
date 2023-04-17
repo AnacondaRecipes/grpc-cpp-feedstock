@@ -72,6 +72,7 @@ outputs:
         - {{ pin_compatible("libprotobuf", min_pin="x.x.x", max_pin="x.x.x") }}
         - zlib >=1.2.13,<1.3.0a0
         - re2
+        - ucrt  # [win]
     test:
       script: run_test_cpp.sh   # [not win]
       script: run_test_cpp.bat  # [win]
