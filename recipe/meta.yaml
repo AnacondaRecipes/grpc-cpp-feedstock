@@ -53,8 +53,8 @@ build:
 
 outputs:
   - name: {{ name }}-cpp
-    script: build_cpp.sh   # [not win]
-    script: build_cpp.bat  # [win]
+    script: build-cpp.sh   # [not win]
+    script: build-cpp.bat  # [win]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -94,8 +94,8 @@ outputs:
       files:
         - tests/include/*
   - name: {{ name }}io
-    script: build_py.sh   # [not win]
-    script: build_py.bat  # [win]
+    script: build-grpcio.sh   # [not win]
+    script: build-grpcio.bat  # [win]
     requirements:
       build:
         - {{ compiler('c') }}
