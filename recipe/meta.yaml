@@ -34,17 +34,6 @@ source:
 
 build:
   number: 0
-{% if static_build == 'yes' %}
-  ignore_run_exports:
-    - abseil-cpp
-    - c-ares
-    - re2
-    - openssl
-    - zlib
-{% else %}
-  run_exports:
-    - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
-{% endif %}
   missing_dso_whitelist:
     - '$RPATH/ld64.so.1'  # [s390x]
   script_env:
@@ -55,6 +44,18 @@ outputs:
   - name: {{ name }}-cpp
     script: build-cpp.sh   # [not win]
     script: build-cpp.bat  # [win]
+    build:
+{% if static_build == 'yes' %}
+      ignore_run_exports:
+        - abseil-cpp
+        - c-ares
+        - re2
+        - openssl
+        - zlib
+{% else %}
+      run_exports:
+        - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
+{% endif %}
     requirements:
       build:
         - {{ compiler('c') }}
