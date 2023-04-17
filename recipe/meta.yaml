@@ -125,7 +125,7 @@ outputs:
       run:
         - python
         - {{ pin_subpackage('grpc-cpp', exact=True) }}
-        - six >=1.5.2
+        - six >=1.6.0
         - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
     test:
       requires:
