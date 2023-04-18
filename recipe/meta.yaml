@@ -117,6 +117,14 @@ outputs:
         - python
         - {{ pin_subpackage('grpc-cpp', exact=True) }}
         - six >=1.6.0
+{% if static_build == 'yes' %}
+        - abseil-cpp 20211102.0
+        - c-ares 1.19.0
+        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
+        - re2 2022.04.01
+        - openssl
+        - zlib
+{% endif %}
         - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
     test:
       requires:
