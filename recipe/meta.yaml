@@ -1,5 +1,5 @@
-{% set name = "grpc-cpp" %}
-{% set version = "1.46.1" %}
+{% set name = "grpc" %}
+{% set version = "1.48.2" %}
 
 # It is not currently possible to compile grpc-cpp on Windows in shared mode:
 # _h_env\Library\include\google/protobuf/io/coded_stream.h(1250):
@@ -19,67 +19,130 @@
 {% endif %}
 
 package:
-  name: {{ name | lower }}
+  name: {{ name | lower }}-suite
   version: {{ version }}
 
 source:
-  url: https://github.com/grpc/grpc/archive/v{{ version }}.tar.gz
-  sha256: 291db3c4e030164421b89833ee761a2e6ca06b1d1f8e67953df762665d89439d
+  url: https://github.com/{{ name }}/{{ name }}/archive/v{{ version }}.tar.gz
+  sha256: bdb8e98145469d58c69ab9f2c9e0bd838c2836a99b5760bc0ebf658623768f52
   patches:
-    - force-protoc-executable.patch
-  # You can use module version of re2 if you add this and chage build.sh:
-  # - git_url: https://github.com/google/re2
-  #   git_ref: aecba11114cf1fac5497aeb844b6966106de3eb6
-  #   folder: third_party/re2
+    - patches/force-protoc-executable.patch
+    - patches/0001-Monkey-patch-distutils.ccompiler.spawn-to-elide-std-.patch
+    - patches/0002-windows-ssl-lib-names.patch
+    - patches/0001-fix-win-commands.patch
+    - patches/0003-Link-against-grpc.patch
 
 build:
-  number: 1
+  number: 0
+
+outputs:
+  - name: {{ name }}-cpp
+    script: build-cpp.sh   # [not win]
+    script: build-cpp.bat  # [win]
+    build:
+      missing_dso_whitelist:
+        - '$RPATH/ld64.so.1'  # [s390x]
+      script_env:
+        - STATIC_BUILD={{ static_build }}
+        - LIB_EXT={{libext}}
 {% if static_build == 'yes' %}
-  ignore_run_exports:
-    - abseil-cpp
-    - c-ares
-    - re2
-    - openssl
-    - zlib
-{% else %}
-  run_exports:
-    - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
+      ignore_run_exports:
+        - abseil-cpp
+        - c-ares
+        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
+        - re2
+        - openssl
+        - zlib
 {% endif %}
-  missing_dso_whitelist:
-    - '$RPATH/ld64.so.1'  # [s390x]
-  script_env:
-    - STATIC_BUILD={{ static_build }}
-    - LIB_EXT={{libext}}
-
-requirements:
-  build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
-    - m2-patch  # [win]
-    - patch  # [not win]
-    - cmake >=3.5.1
-    - pkg-config  # [unix]
-    # `protoc` is also used for building
-    - libprotobuf  # Use the version pinned in cbc.yaml
-    - ninja
-  host:
-    - abseil-cpp 20211102.0
-    - c-ares 1.18.1
-    - libprotobuf  # libprotobuf pins itself to x.x via run_exports
-    - re2 2022.04.01
-    - openssl
-    - zlib 1.2.13
-  run:
-    # Need to pin libprotobuf to the same version used when building,
-    # otherwise we may get a different SO ABI version.
-    # For example 3.6.1 is ABI-incompatible with 3.6.0...
-    - {{ pin_compatible("libprotobuf", min_pin="x.x.x", max_pin="x.x.x") }}
-    - zlib >=1.2.13,<1.3.0a0
-    - re2
-
-test:
-  files:
-    - tests/include/*
+      run_exports:
+        - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - m2-patch  # [win]
+        - patch  # [not win]
+        - cmake >=3.5.1
+        - pkg-config  # [unix]
+        # `protoc` is also used for building
+        - libprotobuf  # Use the version pinned in cbc.yaml
+        - ninja
+      host:
+        - abseil-cpp 20211102.0
+        - c-ares 1.19.0
+        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
+        - re2 2022.04.01
+        - openssl
+        - zlib
+      run:
+        # Need to pin libprotobuf to the same version used when building,
+        # otherwise we may get a different SO ABI version.
+        # For example 3.6.1 is ABI-incompatible with 3.6.0...
+        - {{ pin_compatible("libprotobuf", min_pin="x.x.x", max_pin="x.x.x") }}
+        - zlib >=1.2.13,<1.3.0a0
+        - re2
+    test:
+      script: run_test_cpp.sh   # [not win]
+      script: run_test_cpp.bat  # [win]
+      requires:
+        # protoc needs compiler; cmake also needs one to run package detection, see
+        # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+        - pkg-config
+      files:
+        - tests/include/*
+  - name: {{ name }}io
+    script: build-grpcio.sh   # [not win]
+    script: build-grpcio.bat  # [win]
+    build:
+      missing_dso_whitelist:
+        - '$RPATH/ld64.so.1'  # [s390x]
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - m2-patch  # [win]
+        - patch  # [not win]
+      host:
+        - {{ pin_subpackage('grpc-cpp', exact=True) }}
+        - python
+        - cython >=0.29.8
+        - pip
+        - pthread-stubs     # [linux]
+        - setuptools
+        - wheel >=0.29
+{% if static_build == 'yes' %}
+        - abseil-cpp 20211102.0
+        - c-ares 1.19.0
+        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
+        - re2 2022.04.01
+        - openssl
+        - zlib
+{% endif %}
+      run:
+        - python
+        - {{ pin_subpackage('grpc-cpp', exact=True) }}
+        - six >=1.6.0
+        - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
+    test:
+      requires:
+        - pip
+      imports:
+        - grpc
+        - grpc._cython
+        - grpc._cython._cygrpc
+        - grpc.beta
+        - grpc.framework
+        - grpc.framework.common
+        - grpc.framework.foundation
+        - grpc.framework.interfaces
+        - grpc.framework.interfaces.base
+        - grpc.framework.interfaces.face
+      commands:
+        - pip check
 
 about:
   home: https://grpc.io/

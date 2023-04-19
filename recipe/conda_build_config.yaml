@@ -1,19 +1,4 @@
-# In Linux, absl-cpp is built on all platforms with C++17's features
-# enabled.  Specifically, absl::string_view is a typedef/alias of
-# std::string_view. Calling a function that uses absl::string_view
-# when the standard is below C++17 will result in a link time error
-# (undefined reference).
-#
-# gcc8's support for C++17 is still considered experimental, use a
-# newer version where available.
-c_compiler_version:        # [linux and not aarch64]
-  - 8                      # [linux and not (s390x or aarch64 or ppc64le)]
-  - 8                      # [linux and ppc64le]
-  - 8                      # [linux and s390x]
+c_compiler_version:        # [linux]
+  - 11                     # [linux]
 cxx_compiler_version:      # [linux]
-  - 8                      # [linux and not (s390x or aarch64 or ppc64le)]
-  - 8                      # [linux and ppc64le]
-  - 8                      # [linux and s390x]
-# This needs to be removed after the pinning of libprotobuf has been adjusted.
-libprotobuf:
-- 3.20
+  - 11                     # [linux]
