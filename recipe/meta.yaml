@@ -32,6 +32,7 @@ source:
     - patches/0001-fix-win-commands.patch
     - patches/0003-Link-against-grpc.patch
     - patches/0005-switch-to-C-17-for-grpcio.patch
+    - patches/0006-fix-abseil-setup.patch
 
 build:
   number: 0
