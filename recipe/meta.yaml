@@ -1,5 +1,5 @@
 {% set name = "grpc" %}
-{% set version = "1.48.2" %}
+{% set version = "1.54.0" %}
 
 # It is not currently possible to compile grpc-cpp on Windows in shared mode:
 # _h_env\Library\include\google/protobuf/io/coded_stream.h(1250):
@@ -24,13 +24,14 @@ package:
 
 source:
   url: https://github.com/{{ name }}/{{ name }}/archive/v{{ version }}.tar.gz
-  sha256: bdb8e98145469d58c69ab9f2c9e0bd838c2836a99b5760bc0ebf658623768f52
+  sha256: 5e53505a6c84030a26c4fddd71b3f46feec8e0a8eccff2a903b189d349ca6ff5
   patches:
     - patches/force-protoc-executable.patch
     - patches/0001-Monkey-patch-distutils.ccompiler.spawn-to-elide-std-.patch
     - patches/0002-windows-ssl-lib-names.patch
     - patches/0001-fix-win-commands.patch
     - patches/0003-Link-against-grpc.patch
+    - patches/0005-switch-to-C-17-for-grpcio.patch
 
 build:
   number: 0
@@ -49,7 +50,7 @@ outputs:
       ignore_run_exports:
         - abseil-cpp
         - c-ares
-        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
+        - libprotobuf
         - re2
         - openssl
         - zlib
@@ -68,7 +69,7 @@ outputs:
         - libprotobuf  # Use the version pinned in cbc.yaml
         - ninja
       host:
-        - abseil-cpp 20211102.0
+        - abseil-cpp 20230125.2
         - c-ares 1.19.0
         - libprotobuf  # libprotobuf pins itself to x.x via run_exports
         - re2 2022.04.01
@@ -115,7 +116,7 @@ outputs:
         - setuptools
         - wheel >=0.29
 {% if static_build == 'yes' %}
-        - abseil-cpp 20211102.0
+        - abseil-cpp 20230125.2
         - c-ares 1.19.0
         - libprotobuf  # libprotobuf pins itself to x.x via run_exports
         - re2 2022.04.01
@@ -125,7 +126,6 @@ outputs:
       run:
         - python
         - {{ pin_subpackage('grpc-cpp', exact=True) }}
-        - six >=1.6.0
         - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
     test:
       requires:
