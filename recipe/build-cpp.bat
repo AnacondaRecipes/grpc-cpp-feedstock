@@ -7,6 +7,7 @@
 
 set CFLAGS=
 set CXXFLAGS=
+set CMAKE_ARGS="%CMAKE_ARGS% -DCMAKE_CXX_STANDARD=17"
 
 mkdir build-cpp
 if errorlevel 1 exit 1

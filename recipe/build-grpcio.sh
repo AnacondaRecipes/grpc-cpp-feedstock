@@ -8,6 +8,7 @@ export GRPC_PYTHON_BUILD_SYSTEM_CARES="True"
 export GRPC_PYTHON_BUILD_SYSTEM_GRPC_CORE="True"
 export GRPC_PYTHON_USE_PREBUILT_GRPC_CORE=""
 export GRPC_PYTHON_BUILD_WITH_CYTHON="True"
+export GRPC_PYTHON_CLFAGS="--std=c++17"
 
 if [[ "${target_platform}" == linux-* ]]; then
     # set these so the default in setup.py are not used
