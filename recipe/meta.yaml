@@ -105,13 +105,13 @@ outputs:
       commands:
         # libraries
         {% for each_lib in core_libs + core_cpp_libs + vendored_libs %}
-        - test -f $PREFIX/lib/lib{{ each_lib }}.{{libext}}      # [linux]
-        - if not exist %LIBRARY_LIB%\{{ each_lib }}.{{ libext }} exit 1  # [win]
+        - test -f $PREFIX/lib/lib{{ each_lib }}{{libext}}      # [not win]
+        - if not exist %LIBRARY_LIB%\{{ each_lib }}{{ libext }} exit 1  # [win]
         {% endfor %}
 
         # binaries
         {% for each_lang in binaries_plugin_langs %}
-        - test -f $PREFIX/bin/grpc_{{ each_lang }}_plugin                    # [unix]
+        - test -f $PREFIX/bin/grpc_{{ each_lang }}_plugin                    # [not win]
         - if not exist %LIBRARY_BIN%\grpc_{{ each_lang }}_plugin.exe exit 1  # [win]
         {% endfor %}
 
