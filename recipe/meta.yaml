@@ -18,6 +18,20 @@
 {% set libext = '.dylib' %}  # [osx]
 {% endif %}
 
+# core package & vendored libs use different version scheme than CPP libs, see
+# https://github.com/grpc/grpc/blob/v1.48.1/CMakeLists.txt#L28-L32
+# the difference of 23 is empirical and most recently changed with 1.54
+{% set core_major = version.split(".")[1] | int - 23 %}
+{% set core_version = core_major | string ~ ".0.0" %}
+
+{% set core_libs = ["gpr", "grpc", "grpc_unsecure"] %}
+{% set core_cpp_libs = ["grpc++", "grpc++_unsecure"] %}
+{% set vendored_libs = ["address_sorting", "upb"] %}
+{% set binaries_plugin_langs = [
+    "cpp", "csharp", "node", "objective_c", "php", "python", "ruby"
+] %}
+
+
 package:
   name: {{ name | lower }}-suite
   version: {{ version }}
@@ -84,8 +98,32 @@ outputs:
         - zlib >=1.2.13,<1.3.0a0
         - re2
     test:
-      script: run_test_cpp.sh   # [not win]
-      script: run_test_cpp.bat  # [win]
+      commands:
+        # libraries
+        {% for each_lib in core_libs + core_cpp_libs + vendored_libs %}
+        - test -f $PREFIX/lib/lib{{ each_lib }}.{{libext}}      # [linux]
+        - if not exist %LIBRARY_LIB%\{{ each_lib }}.{{ libext }} exit 1  # [win]
+        {% endfor %}
+
+        # binaries
+        {% for each_lang in binaries_plugin_langs %}
+        - test -f $PREFIX/bin/grpc_{{ each_lang }}_plugin                    # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_{{ each_lang }}_plugin.exe exit 1  # [win]
+        {% endfor %}
+
+        # pkg-config (no metadata for vendored libs)
+        {% for each_lib in core_libs %}
+        - pkg-config --print-errors --exact-version "{{ core_version }}" {{ each_lib }}
+        {% endfor %}
+        {% for each_lib in core_cpp_libs %}
+        - pkg-config --print-errors --exact-version "{{ version }}" {{ each_lib }}
+        {% endfor %}
+
+        # final CMake test to compile examples
+        # partially disabled on unix until libprotobuf-feedstock#127 & 128 are merged
+        - ./run_test_cpp.sh   # [unix]
+        - ./run_test_cpp.bat  # [win]
+
       requires:
         # protoc needs compiler; cmake also needs one to run package detection, see
         # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
@@ -96,6 +134,8 @@ outputs:
         - pkg-config
       files:
         - tests/include/*
+        - ./run_test_cpp.sh   # [unix]
+        - ./run_test_cpp.bat  # [win]
   - name: {{ name }}io
     script: build-grpcio.sh   # [not win]
     script: build-grpcio.bat  # [win]
