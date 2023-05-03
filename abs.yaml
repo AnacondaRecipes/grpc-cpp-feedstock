@@ -3,4 +3,3 @@ channels:
 build_parameters:
   - "--suppress-variables"
   - "--error-overlinking"
-  - "--error-overdepending"
