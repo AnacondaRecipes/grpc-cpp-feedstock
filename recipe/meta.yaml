@@ -68,7 +68,7 @@ outputs:
         - libprotobuf {{ libprotobuf }}
         - ninja
       host:
-        - abseil-cpp 20211102.0
+        - abseil-cpp 20230802
         - c-ares 1.19.0
         - libprotobuf {{ libprotobuf }}
         - re2 2022.04.01
