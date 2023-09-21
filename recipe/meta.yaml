@@ -33,7 +33,7 @@ source:
   #   folder: third_party/re2
 
 build:
-  number: 1
+  number: 2
   # Anaconda's s390x does not contain depdendencies for abseil-cpp or re2, this package is skipped for s390x at this time.
   # Latest protobuf recipe skips win32, so this package does as well.
   skip: true  # [win32]
@@ -65,7 +65,7 @@ requirements:
     - libprotobuf  # Use the version pinned in cbc.yaml
     - ninja
   host:
-    - abseil-cpp
+    - abseil-cpp 20230802.0
     - c-ares
     - libprotobuf  # libprotobuf pins itself to x.x via run_exports
     - re2
