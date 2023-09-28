@@ -33,7 +33,7 @@ source:
     - patches/0003-Link-against-grpc.patch
 
 build:
-  number: 1
+  number: 2
 
 outputs:
   - name: {{ name }}-cpp
@@ -110,7 +110,7 @@ outputs:
       host:
         - {{ pin_subpackage('grpc-cpp', exact=True) }}
         - python
-        - cython 0.29.33
+        - cython 0.29
         - pip
         - pthread-stubs 0.3  # [linux]
         - setuptools
