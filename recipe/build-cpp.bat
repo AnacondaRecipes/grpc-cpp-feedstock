@@ -21,6 +21,7 @@ if "%STATIC_BUILD%"=="yes" (
 
 cmake ..  ^
       -GNinja ^
+      -DCMAKE_CXX_STANDARD=17 ^
       -DCMAKE_BUILD_TYPE=Release ^
       -DBUILD_SHARED_LIBS=%BUILD_SHARED_LIBS% ^
       -DCMAKE_PREFIX_PATH=%CONDA_PREFIX% ^

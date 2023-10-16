@@ -6,8 +6,6 @@ cxx_compiler:               # [win]
   - 'vs2019'                # [win]
 c_compiler:                 # [win]
   - 'vs2019'                # [win]
-vc:                         # [win]
-  - 16                      # [win]
 
 CONDA_BUILD_SYSROOT:       # [osx and x86]
   - /opt/MacOSX10.13.sdk   # [osx and x86]
