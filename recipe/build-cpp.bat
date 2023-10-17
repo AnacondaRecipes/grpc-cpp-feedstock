@@ -7,8 +7,8 @@
 
 set "CFLAGS="
 set "CXXFLAGS="
-set "CFLAGS=%CFLAGS% -fpermissive"
-set "CXXFLAGS=%CXXFLAGS% -fpermissive"
+set "CFLAGS=%CFLAGS% /permissive-"
+set "CXXFLAGS=%CXXFLAGS% /permissive-"
 
 echo %CFLAGS%
 echo %CXXFLAGS%
