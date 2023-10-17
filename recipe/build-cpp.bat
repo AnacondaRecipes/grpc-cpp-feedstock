@@ -23,7 +23,6 @@ cmake ..  ^
       -GNinja ^
       -DCMAKE_CXX_STANDARD=17 ^
       -DCMAKE_BUILD_TYPE=Release ^
-      -DBUILD_SHARED_LIBS=ON ^
       -DCMAKE_PREFIX_PATH=%CONDA_PREFIX% ^
       -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% ^
       -DgRPC_ABSL_PROVIDER="package" ^
