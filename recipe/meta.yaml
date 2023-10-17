@@ -42,7 +42,7 @@ outputs:
     script: build-cpp.sh   # [not win]
     script: build-cpp.bat  # [win]
     build:
-      missing_dso_whitelist:
+      missing_dso_whitelist:  # [s390x]
         - '$RPATH/ld64.so.1'  # [s390x]
       script_env:
         - STATIC_BUILD={{ static_build }}
@@ -102,7 +102,7 @@ outputs:
     script: build-grpcio.sh   # [not win]
     script: build-grpcio.bat  # [win]
     build:
-      missing_dso_whitelist:
+      missing_dso_whitelist:  # [s390x]
         - '$RPATH/ld64.so.1'  # [s390x]
     requirements:
       build:
