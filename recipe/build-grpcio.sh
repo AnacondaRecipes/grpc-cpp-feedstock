@@ -29,4 +29,4 @@ fi
 [[ -f "${SRC_DIR}/cc" ]] || ln -sf "$(which $CC)" "$SRC_DIR/cc"
 export PATH="$SRC_DIR:$PATH"
 
-$PYTHON -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+$PYTHON -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -v

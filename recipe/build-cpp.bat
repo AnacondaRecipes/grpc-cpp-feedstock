@@ -5,8 +5,13 @@
 @rem library size (more than 100MB per .lib file).  Unsetting those flags
 @rem simply works.
 
-set CFLAGS=
-set CXXFLAGS=
+set "CFLAGS="
+set "CXXFLAGS="
+set "CFLAGS=%CFLAGS% -fpermissive"
+set "CXXFLAGS=%CXXFLAGS% -fpermissive"
+
+echo %CFLAGS%
+echo %CXXFLAGS%
 
 mkdir build-cpp
 if errorlevel 1 exit 1
