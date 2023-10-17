@@ -12,6 +12,7 @@ mkdir build-cpp
 if errorlevel 1 exit 1
 
 cd build-cpp
+if errorlevel 1 exit 1
 
 if "%STATIC_BUILD%"=="yes" (
   set BUILD_SHARED_LIBS=OFF
@@ -34,7 +35,7 @@ cmake ..  ^
       -DgRPC_RE2_PROVIDER="package" ^
       -DgRPC_ZLIB_PROVIDER="package" ^
       -DCMAKE_VERBOSE_MAKEFILE=ON
+if errorlevel 1 exit 1
 
-ninja install -v
-
+ninja install
 if errorlevel 1 exit 1
