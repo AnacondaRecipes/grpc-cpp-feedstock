@@ -1,22 +1,9 @@
 {% set name = "grpc" %}
 {% set version = "1.48.2" %}
 
-# It is not currently possible to compile grpc-cpp on Windows in shared mode:
-# _h_env\Library\include\google/protobuf/io/coded_stream.h(1250):
-#   warning C4251: 'google::protobuf::io::CodedOutputStream::default_serialization_deterministic_': struct 'std::atomic<bool>'
-#   needs to have dll-interface to be used by clients of class 'google::protobuf::io::CodedOutputStream'
-# LINK : fatal error LNK1181: cannot open input file 'gpr.lib'
-{% set static_build = 'yes' %}  # [win]
-{% set static_build = 'no' %}  # [not win]
-
-{% if static_build == 'yes' %}
-{% set libext = '.lib' %}  # [win]
-{% set libext = '.a' %}  # [not win]
-{% else %}
 {% set libext = '.dll' %}  # [win]
 {% set libext = '.so' %}  # [linux]
 {% set libext = '.dylib' %}  # [osx]
-{% endif %}
 
 package:
   name: {{ name | lower }}-suite
@@ -45,17 +32,7 @@ outputs:
       missing_dso_whitelist:  # [s390x]
         - '$RPATH/ld64.so.1'  # [s390x]
       script_env:
-        - STATIC_BUILD={{ static_build }}
         - LIB_EXT={{libext}}
-{% if static_build == 'yes' %}
-      ignore_run_exports:
-        - abseil-cpp
-        - c-ares
-        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
-        - re2
-        - openssl
-        - zlib
-{% endif %}
       run_exports:
         - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
     requirements:
@@ -118,14 +95,12 @@ outputs:
         - pthread-stubs 0.3  # [linux]
         - setuptools
         - wheel >=0.29
-{% if static_build == 'yes' %}
         - abseil-cpp 20230802.0
         - c-ares 1.19.1
         - libprotobuf {{ libprotobuf }}
         - re2 2022.04.01
         - openssl {{ openssl }}
         - zlib {{ zlib }}
-{% endif %}
       run:
         - python
         - {{ pin_subpackage('grpc-cpp', exact=True) }}

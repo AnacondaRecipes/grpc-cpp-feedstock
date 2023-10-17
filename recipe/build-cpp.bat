@@ -19,17 +19,11 @@ if errorlevel 1 exit 1
 cd build-cpp
 if errorlevel 1 exit 1
 
-if "%STATIC_BUILD%"=="yes" (
-  set BUILD_SHARED_LIBS=OFF
-) else (
-  set BUILD_SHARED_LIBS=ON
-)
-
 cmake ..  ^
       -GNinja ^
       -DCMAKE_CXX_STANDARD=17 ^
       -DCMAKE_BUILD_TYPE=Release ^
-      -DBUILD_SHARED_LIBS=%BUILD_SHARED_LIBS% ^
+      -DBUILD_SHARED_LIBS=ON ^
       -DCMAKE_PREFIX_PATH=%CONDA_PREFIX% ^
       -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% ^
       -DgRPC_ABSL_PROVIDER="package" ^

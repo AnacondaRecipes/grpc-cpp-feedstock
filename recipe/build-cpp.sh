@@ -7,18 +7,12 @@ export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=17"
 mkdir -p build-cpp
 pushd build-cpp
 
-if [[ ${STATIC_BUILD} == yes ]]; then
-    BUILD_SHARED_LIBS=OFF
-else
-    BUILD_SHARED_LIBS=ON
-fi
-
 if [[ $target_platform == osx-* ]]; then
     ln -s $BUILD_PREFIX/bin/${HOST}-ar ${HOST}-ar
     ln -s $BUILD_PREFIX/bin/${HOST}-ranlib ${HOST}-ranlib
 fi
 cmake ${CMAKE_ARGS} ..  \
-    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS} \
+    -DBUILD_SHARED_LIBS=ON \
     -GNinja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
