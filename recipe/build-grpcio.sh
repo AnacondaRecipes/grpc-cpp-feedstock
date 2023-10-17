@@ -13,7 +13,7 @@ if [[ "${target_platform}" == linux-* ]]; then
     # set these so the default in setup.py are not used
     # it seems that we need to link to pthrad on linux or osx.
     export GRPC_PYTHON_LDFLAGS="-lpthread"
-elif [[ "$target_platform" == osx-* ]]; then
+    elif [[ "$target_platform" == osx-* ]]; then
     export CC=$(basename "${CC}")
     export GRPC_PYTHON_LDFLAGS=" -framework CoreFoundation"
     # cp $RECIPE_DIR/clang_wrapper.sh $SRC_DIR/$CC
