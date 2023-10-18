@@ -1,5 +1,7 @@
 @echo on
 
+set "CFLAGS=%CFLAGS% /permissive-"
+set "CXXFLAGS=%CXXFLAGS% /permissive-"
 
 echo %CFLAGS%
 echo %CXXFLAGS%
