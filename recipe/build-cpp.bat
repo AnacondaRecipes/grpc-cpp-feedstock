@@ -3,7 +3,10 @@
 :: cmd
 echo "Building %PKG_NAME%."
 
-set "CFLAGS=%CFLAGS% /permissive- "
+set CFLAGS=
+set CXXFLAGS=
+
+set "CFLAGS=%CFLAGS% /permissive- /std:c++17"
 set "CXXFLAGS=%CXXFLAGS% /permissive- /std:c++17"
 
 echo %CFLAGS%
@@ -36,7 +39,7 @@ if errorlevel 1 exit /b 1
 
 :: Install.
 echo "Installing..."
-ninja install -v
+ninja install
 if errorlevel 1 exit /b 1
 
 
