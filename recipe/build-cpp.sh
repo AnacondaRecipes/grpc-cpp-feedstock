@@ -12,7 +12,6 @@ if [[ $target_platform == osx-* ]]; then
     ln -s $BUILD_PREFIX/bin/${HOST}-ranlib ${HOST}-ranlib
 fi
 cmake ${CMAKE_ARGS} ..  \
-    -DBUILD_SHARED_LIBS=ON \
     -GNinja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
