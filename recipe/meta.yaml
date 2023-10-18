@@ -61,9 +61,18 @@ outputs:
         - zlib >=1.2.13,<1.3.0a0
         - re2
         - openssl 3.*
+
+    # core package & vendored libs use different version scheme than CPP libs, see
+    # https://github.com/grpc/grpc/blob/v1.48.1/CMakeLists.txt#L28-L32
+    {% set core_version = "26.0.0" %}
+
+    {% set core_libs = ["gpr", "grpc", "grpc_unsecure"] %}
+    {% set core_cpp_libs = ["grpc++", "grpc++_unsecure"] %}
+    {% set vendored_libs = ["address_sorting", "upb"] %}
+    {% set binaries_plugin_langs = [
+        "cpp", "csharp", "node", "objective_c", "php", "python", "ruby"
+    ] %}
     test:
-      script: run_test_cpp.sh   # [not win]
-      script: run_test_cpp.bat  # [win]
       requires:
         # protoc needs compiler; cmake also needs one to run package detection, see
         # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
@@ -74,6 +83,37 @@ outputs:
         - pkg-config
       files:
         - tests/include/*
+      commands:
+        # libraries
+        {% for each_lib in core_libs + core_cpp_libs + vendored_libs %}
+        # presence of shared libs (unix)
+        - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
+        - test -f $PREFIX/lib/lib{{ each_lib }}.dylib           # [osx]
+
+        # absence of static libs (unix)
+        - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
+
+        # static libs on windows
+        - if not exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1  # [win]
+        {% endfor %}
+
+        # binaries
+        {% for each_lang in binaries_plugin_langs %}
+        - test -f $PREFIX/bin/grpc_{{ each_lang }}_plugin                    # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_{{ each_lang }}_plugin.exe exit 1  # [win]
+        {% endfor %}
+
+        # pkg-config (no metadata for vendored libs)
+        # should work on windows in principle, but our openssl builds don't have a .pc file
+        {% for each_lib in core_libs %}
+        - pkg-config --print-errors --exact-version "{{ core_version }}" {{ each_lib }}  # [unix]
+        {% endfor %}
+        {% for each_lib in core_cpp_libs %}
+        - pkg-config --print-errors --exact-version "{{ version }}" {{ each_lib }}       # [unix]
+        {% endfor %}
+
+        - ./run_test_grpc.sh   # [unix]
+        - ./run_test_grpc.bat  # [win]
 
   - name: {{ name }}io
     script: build-grpcio.sh   # [not win]
