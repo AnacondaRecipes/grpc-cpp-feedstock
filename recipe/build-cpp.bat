@@ -7,8 +7,8 @@
 
 set "CFLAGS="
 set "CXXFLAGS="
-set "CFLAGS=%CFLAGS% /permissive-"
-set "CXXFLAGS=%CXXFLAGS% /permissive-"
+set "CFLAGS=%CFLAGS% /permissive- /std:c++17"
+set "CXXFLAGS=%CXXFLAGS% /permissive- /std:c++17"
 
 echo %CFLAGS%
 echo %CXXFLAGS%
