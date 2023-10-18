@@ -18,6 +18,7 @@ if [[ $target_platform == osx-* ]]; then
 fi
 cmake ${CMAKE_ARGS} ..  \
     -GNinja \
+    -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
     -DCMAKE_PREFIX_PATH=$PREFIX \
@@ -35,11 +36,21 @@ cmake ${CMAKE_ARGS} ..  \
     -DCMAKE_VERBOSE_MAKEFILE=ON \
     -DProtobuf_PROTOC_EXECUTABLE=$BUILD_PREFIX/bin/protoc
 
-ninja install
+# Build.
+echo "Building..."
+ninja -j${CPU_COUNT} || exit 1
+
+# Installing
+echo "Installing..."
+ninja install || exit 1
+
+popd
 
 # These are in conflict with the re2 package.
 rm -rf ${PREFIX}/include/re2
 rm -rf ${PREFIX}/lib/libre2.a
 rm -rf ${PREFIX}/lib/pkgconfig/re2.pc
 
-popd
+# Error free exit!
+echo "Error free exit!"
+exit 0

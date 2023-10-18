@@ -83,8 +83,12 @@ outputs:
         - pkg-config
       files:
         - tests/include/*
+        - test_grpc.sh
+        - test_grpc.bat
       commands:
         # libraries
+        - ls %LIBRARY_LIB%  # [win]
+
         {% for each_lib in core_libs + core_cpp_libs + vendored_libs %}
         # presence of shared libs (unix)
         - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
@@ -112,8 +116,8 @@ outputs:
         - pkg-config --print-errors --exact-version "{{ version }}" {{ each_lib }}       # [unix]
         {% endfor %}
 
-        - ./run_test_grpc.sh   # [unix]
-        - ./run_test_grpc.bat  # [win]
+        - ./test_grpc.sh   # [unix]
+        - ./test_grpc.bat  # [win]
 
   - name: {{ name }}io
     script: build-grpcio.sh   # [not win]
@@ -147,6 +151,8 @@ outputs:
         - six >=1.6.0
         - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
     test:
+      files:
+        - grpcio_distribtest.py
       requires:
         - pip
       imports:
@@ -162,6 +168,7 @@ outputs:
         - grpc.framework.interfaces.face
       commands:
         - pip check
+        - python grpcio_distribtest.py
 
 about:
   home: https://grpc.io/

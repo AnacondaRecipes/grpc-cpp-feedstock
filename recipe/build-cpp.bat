@@ -1,5 +1,8 @@
 @echo on
 
+:: cmd
+echo "Building %PKG_NAME%."
+
 set "CFLAGS=%CFLAGS% /permissive-"
 set "CXXFLAGS=%CXXFLAGS% /permissive-"
 
@@ -7,8 +10,6 @@ echo %CFLAGS%
 echo %CXXFLAGS%
 
 mkdir build-cpp
-if errorlevel 1 exit 1
-
 cd build-cpp
 if errorlevel 1 exit 1
 
@@ -28,5 +29,17 @@ cmake ..  ^
       -DCMAKE_VERBOSE_MAKEFILE=ON
 if errorlevel 1 exit 1
 
+:: Build.
+echo "Building..."
+ninja -j%CPU_COUNT%
+if errorlevel 1 exit /b 1
+
+:: Install.
+echo "Installing..."
 ninja install
-if errorlevel 1 exit 1
+if errorlevel 1 exit /b 1
+
+
+:: Error free exit.
+echo "Error free exit!"
+exit 0
