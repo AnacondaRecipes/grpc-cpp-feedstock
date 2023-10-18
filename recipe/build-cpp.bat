@@ -3,11 +3,8 @@
 :: cmd
 echo "Building %PKG_NAME%."
 
-set CFLAGS=
-set CXXFLAGS=
-
-set "CFLAGS=%CFLAGS% /permissive- /std:c++17"
-set "CXXFLAGS=%CXXFLAGS% /permissive- /std:c++17"
+::set "CFLAGS=%CFLAGS% /permissive- /std:c++17"
+::set "CXXFLAGS=%CXXFLAGS% /permissive- /std:c++17"
 
 echo %CFLAGS%
 echo %CXXFLAGS%
