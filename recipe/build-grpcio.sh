@@ -22,8 +22,8 @@ if [[ "${target_platform}" == linux-* ]]; then
 fi
 
 if [[ "$target_platform" == osx-64 ]]; then
-    export CFLAGS="$CFLAGS -DTARGET_OS_OSX=1 --sysroot /opt/MacOSX10.13.sdk/ -Wno-unknown-warning-option -Wno-unused-command-line-argument -Wno-nullability-completeness"
-    export CXXFLAGS="$CXXFLAGS -DTARGET_OS_OSX=1 --sysroot /opt/MacOSX10.13.sdk/ -Wno-unknown-warning-option -Wno-unused-command-line-argument -Wno-nullability-completeness"
+    export CFLAGS="$CFLAGS -DTARGET_OS_OSX=1 --sysroot ${CONDA_BUILD_SYSROOT} -Wno-unknown-warning-option -Wno-unused-command-line-argument -Wno-nullability-completeness"
+    export CXXFLAGS="$CXXFLAGS -DTARGET_OS_OSX=1 --sysroot ${CONDA_BUILD_SYSROOT} -Wno-unknown-warning-option -Wno-unused-command-line-argument -Wno-nullability-completeness"
 fi
 
 [[ -f "${SRC_DIR}/cc" ]] || ln -sf "$(which $CC)" "$SRC_DIR/cc"

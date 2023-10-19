@@ -2,7 +2,19 @@
 
 set -ex
 
-export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=17"
+if [[ "${target_platform}" == osx* ]]; then
+    export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=14"
+
+    # See https://conda-forge.org/docs/maintainer/knowledge_base.html#newer-c-features-with-old-sdk
+    CXXFLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY"
+else
+    # In Linux, absl-cpp is built on all platforms with C++17's features
+    # enabled.  Specifically, absl::string_view is a typedef/alias of
+    # std::string_view. Calling a function that uses absl::string_view
+    # when the standard is below C++17 will result in a link time error
+    # (undefined reference).
+    export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=17"
+fi
 
 if [[ "${target_platform}" == osx-* ]]; then
     # See https://conda-forge.org/docs/maintainer/knowledge_base.html#newer-c-features-with-old-sdk
