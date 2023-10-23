@@ -10,9 +10,3 @@ if [[ "${build_platform}" == "${target_platform}" ]]; then
   test -f hello.grpc.pb.h
   test -f hello.grpc.pb.cc
 fi
-
-test -f $PREFIX/bin/grpc_cpp_plugin
-test -f $PREFIX/lib/libgrpc${SHLIB_EXT}
-test -f $PREFIX/lib/libgrpc_unsecure${SHLIB_EXT}
-test -f $PREFIX/lib/libgrpc++${SHLIB_EXT}
-test -f $PREFIX/lib/libgrpc++_unsecure${SHLIB_EXT}

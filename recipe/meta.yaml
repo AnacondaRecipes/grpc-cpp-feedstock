@@ -1,22 +1,9 @@
 {% set name = "grpc" %}
 {% set version = "1.48.2" %}
 
-# It is not currently possible to compile grpc-cpp on Windows in shared mode:
-# _h_env\Library\include\google/protobuf/io/coded_stream.h(1250):
-#   warning C4251: 'google::protobuf::io::CodedOutputStream::default_serialization_deterministic_': struct 'std::atomic<bool>'
-#   needs to have dll-interface to be used by clients of class 'google::protobuf::io::CodedOutputStream'
-# LINK : fatal error LNK1181: cannot open input file 'gpr.lib'
-{% set static_build = 'yes' %}  # [win]
-{% set static_build = 'no' %}  # [not win]
-
-{% if static_build == 'yes' %}
-{% set libext = '.lib' %}  # [win]
-{% set libext = '.a' %}  # [not win]
-{% else %}
 {% set libext = '.dll' %}  # [win]
 {% set libext = '.so' %}  # [linux]
 {% set libext = '.dylib' %}  # [osx]
-{% endif %}
 
 package:
   name: {{ name | lower }}-suite
@@ -26,34 +13,27 @@ source:
   url: https://github.com/{{ name }}/{{ name }}/archive/v{{ version }}.tar.gz
   sha256: bdb8e98145469d58c69ab9f2c9e0bd838c2836a99b5760bc0ebf658623768f52
   patches:
-    - patches/force-protoc-executable.patch
-    - patches/0001-Monkey-patch-distutils.ccompiler.spawn-to-elide-std-.patch
-    - patches/0002-windows-ssl-lib-names.patch
-    - patches/0001-fix-win-commands.patch
+    - patches/0001-windows-ssl-lib-names.patch
+    - patches/0002-fix-win-setup-cmds.patch
     - patches/0003-Link-against-grpc.patch
+    - patches/0004-force-protoc-executable.patch
+    - patches/0005-patch-tests-to-use-passed-CXX_STANDARD.patch
+    - patches/0006-switch-to-C-17-for-grpcio.patch
+    - patches/0007-fix-abseil-setup.patch
 
 build:
-  number: 2
+  number: 3
+  #skip: true  # [not win]
 
 outputs:
   - name: {{ name }}-cpp
     script: build-cpp.sh   # [not win]
     script: build-cpp.bat  # [win]
     build:
-      missing_dso_whitelist:
+      missing_dso_whitelist:  # [s390x]
         - '$RPATH/ld64.so.1'  # [s390x]
       script_env:
-        - STATIC_BUILD={{ static_build }}
         - LIB_EXT={{libext}}
-{% if static_build == 'yes' %}
-      ignore_run_exports:
-        - abseil-cpp
-        - c-ares
-        - libprotobuf  # libprotobuf pins itself to x.x via run_exports
-        - re2
-        - openssl
-        - zlib
-{% endif %}
       run_exports:
         - {{ pin_subpackage('grpc-cpp', max_pin='x.x') }}
     requirements:
@@ -68,8 +48,8 @@ outputs:
         - libprotobuf {{ libprotobuf }}
         - ninja
       host:
-        - abseil-cpp 20211102.0
-        - c-ares 1.19.0
+        - abseil-cpp 20230802.0
+        - c-ares 1.19.1
         - libprotobuf {{ libprotobuf }}
         - re2 2022.04.01
         - openssl {{ openssl }}
@@ -82,9 +62,18 @@ outputs:
         - zlib >=1.2.13,<1.3.0a0
         - re2
         - openssl 3.*
+
+    # core package & vendored libs use different version scheme than CPP libs, see
+    # https://github.com/grpc/grpc/blob/v1.48.1/CMakeLists.txt#L28-L32
+    {% set core_version = "26.0.0" %}
+
+    {% set core_libs = ["gpr", "grpc", "grpc_unsecure"] %}
+    {% set core_cpp_libs = ["grpc++", "grpc++_unsecure"] %}
+    {% set vendored_libs = ["address_sorting", "upb"] %}
+    {% set binaries_plugin_langs = [
+        "cpp", "csharp", "node", "objective_c", "php", "python", "ruby"
+    ] %}
     test:
-      script: run_test_cpp.sh   # [not win]
-      script: run_test_cpp.bat  # [win]
       requires:
         # protoc needs compiler; cmake also needs one to run package detection, see
         # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
@@ -95,11 +84,47 @@ outputs:
         - pkg-config
       files:
         - tests/include/*
+        - test_grpc.sh
+        - test_grpc.bat
+      commands:
+        # libraries
+        - ls %LIBRARY_LIB%  # [win]
+
+        {% for each_lib in core_libs + core_cpp_libs + vendored_libs %}
+        # presence of shared libs (unix)
+        - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
+        - test -f $PREFIX/lib/lib{{ each_lib }}.dylib           # [osx]
+
+        # absence of static libs (unix)
+        - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
+
+        # static libs on windows
+        - if not exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1  # [win]
+        {% endfor %}
+
+        # binaries
+        {% for each_lang in binaries_plugin_langs %}
+        - test -f $PREFIX/bin/grpc_{{ each_lang }}_plugin                    # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_{{ each_lang }}_plugin.exe exit 1  # [win]
+        {% endfor %}
+
+        # pkg-config (no metadata for vendored libs)
+        # should work on windows in principle, but our openssl builds don't have a .pc file
+        {% for each_lib in core_libs %}
+        - pkg-config --print-errors --exact-version "{{ core_version }}" {{ each_lib }}  # [unix]
+        {% endfor %}
+        {% for each_lib in core_cpp_libs %}
+        - pkg-config --print-errors --exact-version "{{ version }}" {{ each_lib }}       # [unix]
+        {% endfor %}
+
+        - ./test_grpc.sh   # [unix]
+        - ./test_grpc.bat  # [win]
+
   - name: {{ name }}io
     script: build-grpcio.sh   # [not win]
     script: build-grpcio.bat  # [win]
     build:
-      missing_dso_whitelist:
+      missing_dso_whitelist:  # [s390x]
         - '$RPATH/ld64.so.1'  # [s390x]
     requirements:
       build:
@@ -115,20 +140,20 @@ outputs:
         - pthread-stubs 0.3  # [linux]
         - setuptools
         - wheel >=0.29
-{% if static_build == 'yes' %}
-        - abseil-cpp 20211102.0
-        - c-ares 1.19.0
+        - abseil-cpp 20230802.0
+        - c-ares 1.19.1
         - libprotobuf {{ libprotobuf }}
         - re2 2022.04.01
         - openssl {{ openssl }}
         - zlib {{ zlib }}
-{% endif %}
       run:
         - python
         - {{ pin_subpackage('grpc-cpp', exact=True) }}
         - six >=1.6.0
         - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
     test:
+      files:
+        - grpcio_distribtest.py
       requires:
         - pip
       imports:
@@ -144,6 +169,7 @@ outputs:
         - grpc.framework.interfaces.face
       commands:
         - pip check
+        - python grpcio_distribtest.py
 
 about:
   home: https://grpc.io/
