@@ -1,5 +1,5 @@
 {% set name = "grpc" %}
-{% set version = "1.48.2" %}
+{% set version = "1.59.2" %}
 
 {% set libext = '.dll' %}  # [win]
 {% set libext = '.so' %}  # [linux]
@@ -11,15 +11,16 @@ package:
 
 source:
   url: https://github.com/{{ name }}/{{ name }}/archive/v{{ version }}.tar.gz
-  sha256: bdb8e98145469d58c69ab9f2c9e0bd838c2836a99b5760bc0ebf658623768f52
+  sha256: a3a65f0129c4922c5d7f4c11dcd40083a12ca54076fd3a927bcd63c53b7e44a5
   patches:
     - patches/0001-windows-ssl-lib-names.patch
     - patches/0002-fix-win-setup-cmds.patch
     - patches/0003-Link-against-grpc.patch
     - patches/0004-force-protoc-executable.patch
-    - patches/0005-patch-tests-to-use-passed-CXX_STANDARD.patch
-    - patches/0006-switch-to-C-17-for-grpcio.patch
-    - patches/0007-fix-abseil-setup.patch
+    - patches/0005-switch-to-C-17-for-grpcio.patch
+    - patches/0006-fix-abseil-setup.patch
+    - patches/0007-mark-linkage-of-c-ares-re2-zlib-as-private.patch
+    - patches/0008-link-grpc-_unsecure-to-grpc.patch
 
 build:
   number: 0

@@ -1,0 +1,136 @@
+From 58485e3ebfb41edaa6ee8db1d90c99462ac893f9 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Tue, 23 Aug 2022 11:45:20 +0200
+Subject: [PATCH 7/8] mark linkage of c-ares/re2/zlib as private
+
+See also: https://github.com/grpc/grpc/issues/30838
+
+Co-Authored-By: Mark Harfouche <mark.harfouche@gmail.com>
+---
+ CMakeLists.txt | 102 +++++++++++++++++++++++++++----------------------
+ 1 file changed, 56 insertions(+), 46 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 14501a181d..f9ae4d9861 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2540,32 +2540,37 @@ target_include_directories(grpc
+     ${_gRPC_ZLIB_INCLUDE_DIR}
+ )
+ target_link_libraries(grpc
+-  ${_gRPC_ALLTARGETS_LIBRARIES}
+-  ${_gRPC_RE2_LIBRARIES}
+-  upb_json_lib
+-  upb_textformat_lib
+-  ${_gRPC_ZLIB_LIBRARIES}
+-  absl::algorithm_container
+-  absl::cleanup
+-  absl::flat_hash_map
+-  absl::flat_hash_set
+-  absl::inlined_vector
+-  absl::bind_front
+-  absl::function_ref
+-  absl::hash
+-  absl::type_traits
+-  absl::random_bit_gen_ref
+-  absl::random_distributions
+-  absl::statusor
+-  absl::span
+-  absl::utility
+-  ${_gRPC_CARES_LIBRARIES}
+-  gpr
+-  ${_gRPC_SSL_LIBRARIES}
+-  ${_gRPC_ADDRESS_SORTING_LIBRARIES}
++  # core libs
++  PUBLIC  ${_gRPC_ALLTARGETS_LIBRARIES}
++  # vendored libs
++  PUBLIC  ${_gRPC_ADDRESS_SORTING_LIBRARIES}
++  PUBLIC  upb_json_lib
++  PUBLIC  upb_textformat_lib
++  # external dependencies used within grpc
++  PRIVATE ${_gRPC_CARES_LIBRARIES}
++  PRIVATE ${_gRPC_RE2_LIBRARIES}
++  PRIVATE ${_gRPC_ZLIB_LIBRARIES}
++  # external dependencies that need to available at runtime
++  PUBLIC  ${_gRPC_SSL_LIBRARIES}
++  PUBLIC  absl::algorithm_container
++  PUBLIC  absl::cleanup
++  PUBLIC  absl::flat_hash_map
++  PUBLIC  absl::flat_hash_set
++  PUBLIC  absl::inlined_vector
++  PUBLIC  absl::bind_front
++  PUBLIC  absl::function_ref
++  PUBLIC  absl::hash
++  PUBLIC  absl::type_traits
++  PUBLIC  absl::random_bit_gen_ref
++  PUBLIC  absl::random_distributions
++  PUBLIC  absl::statusor
++  PUBLIC  absl::span
++  PUBLIC  absl::utility
++  # targets which belong to grpc anyway
++  PUBLIC  gpr
+ )
+ if(_gRPC_PLATFORM_IOS OR _gRPC_PLATFORM_MAC)
+-  target_link_libraries(grpc "-framework CoreFoundation")
++  target_link_libraries(grpc PUBLIC "-framework CoreFoundation")
+ endif()
+ 
+ foreach(_hdr
+@@ -3202,30 +3207,35 @@ target_include_directories(grpc_unsecure
+     ${_gRPC_ZLIB_INCLUDE_DIR}
+ )
+ target_link_libraries(grpc_unsecure
+-  ${_gRPC_ALLTARGETS_LIBRARIES}
+-  upb_collections_lib
+-  upb
+-  ${_gRPC_ZLIB_LIBRARIES}
+-  absl::algorithm_container
+-  absl::cleanup
+-  absl::flat_hash_map
+-  absl::flat_hash_set
+-  absl::inlined_vector
+-  absl::bind_front
+-  absl::function_ref
+-  absl::hash
+-  absl::type_traits
+-  absl::random_bit_gen_ref
+-  absl::random_distributions
+-  absl::statusor
+-  absl::span
+-  absl::utility
+-  ${_gRPC_CARES_LIBRARIES}
+-  gpr
+-  ${_gRPC_ADDRESS_SORTING_LIBRARIES}
++  # core libs
++  PUBLIC  ${_gRPC_ALLTARGETS_LIBRARIES}
++  # vendored libs
++  PUBLIC  ${_gRPC_ADDRESS_SORTING_LIBRARIES}
++  PUBLIC  upb_collections_lib
++  PUBLIC  upb
++  # external dependencies used within grpc
++  PRIVATE ${_gRPC_CARES_LIBRARIES}
++  PRIVATE ${_gRPC_ZLIB_LIBRARIES}
++  # external dependencies that need to available at runtime
++  PUBLIC  absl::algorithm_container
++  PUBLIC  absl::cleanup
++  PUBLIC  absl::flat_hash_map
++  PUBLIC  absl::flat_hash_set
++  PUBLIC  absl::inlined_vector
++  PUBLIC  absl::bind_front
++  PUBLIC  absl::function_ref
++  PUBLIC  absl::hash
++  PUBLIC  absl::type_traits
++  PUBLIC  absl::random_bit_gen_ref
++  PUBLIC  absl::random_distributions
++  PUBLIC  absl::statusor
++  PUBLIC  absl::span
++  PUBLIC  absl::utility
++  # targets which belong to grpc anyway
++  PUBLIC  gpr
+ )
+ if(_gRPC_PLATFORM_IOS OR _gRPC_PLATFORM_MAC)
+-  target_link_libraries(grpc_unsecure "-framework CoreFoundation")
++  target_link_libraries(grpc_unsecure PUBLIC "-framework CoreFoundation")
+ endif()
+ 
+ foreach(_hdr
