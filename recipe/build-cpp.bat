@@ -19,6 +19,7 @@ cmake ..  ^
       -DCMAKE_BUILD_TYPE=Release ^
       -DCMAKE_PREFIX_PATH=%CONDA_PREFIX% ^
       -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% ^
+      -DProtobuf_PROTOC_EXECUTABLE=%LIBRARY_BIN%\protoc.exe ^
       -DgRPC_ABSL_PROVIDER="package" ^
       -DgRPC_CARES_PROVIDER="package" ^
       -DgRPC_GFLAGS_PROVIDER="package" ^
