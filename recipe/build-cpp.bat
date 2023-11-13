@@ -15,7 +15,6 @@ if errorlevel 1 exit 1
 
 cmake ..  ^
       -GNinja ^
-      -DBUILD_SHARED_LIBS=ON ^
       -DCMAKE_CXX_STANDARD=17 ^
       -DCMAKE_BUILD_TYPE=Release ^
       -DCMAKE_PREFIX_PATH=%CONDA_PREFIX% ^
