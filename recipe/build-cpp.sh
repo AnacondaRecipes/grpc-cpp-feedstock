@@ -22,6 +22,7 @@ pushd build-cpp
 if [[ $target_platform == osx-* ]]; then
     ln -s $BUILD_PREFIX/bin/${HOST}-ar ${HOST}-ar
     ln -s $BUILD_PREFIX/bin/${HOST}-ranlib ${HOST}-ranlib
+    CXXFLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_AVAILABILITY"
 fi
 cmake ${CMAKE_ARGS} ..  \
     -GNinja \
