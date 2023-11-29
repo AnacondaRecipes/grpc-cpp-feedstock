@@ -145,7 +145,7 @@ outputs:
       host:
         - {{ pin_subpackage('grpc-cpp', exact=True) }}
         - python
-        - cython 0.29
+        - cython <3
         - pip
         - pthread-stubs 0.3  # [linux]
         - setuptools
