@@ -24,4 +24,4 @@ fi
 ln -sf "$(which $CC)" "$SRC_DIR/cc"
 export PATH="$SRC_DIR:$PATH"
 
-$PYTHON -m pip install . --no-deps --ignore-installed --no-cache-dir -v
+$PYTHON -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -v

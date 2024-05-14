@@ -40,6 +40,11 @@ source:
 build:
   number: 0
 
+requirements:
+  build:
+    - patch # [unix]
+    - m2-patch # [win]
+
 outputs:
   - name: libgrpc
     script: build-cpp.sh  # [not win]
@@ -56,7 +61,7 @@ outputs:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
         # During cross-compilation, we need to build the grpc_cpp_plugin for the
         # architecture of the build agent (where it will be executed afterwards),
         # thus we need the respective host dependencies also in the build env.
@@ -67,14 +72,13 @@ outputs:
         - re2           # [build_platform != target_platform]
         - zlib          # [build_platform != target_platform]
       host:
-        - libabseil
-        - c-ares
-        - libprotobuf
-        - re2
-        - openssl
-        - zlib
+        - libabseil 20240116.2
+        - c-ares 1.19.1
+        - libprotobuf 4.25.3
+        - re2 2022.04.01
+        - openssl {{ openssl }}
+        - zlib {{ zlib }}
       run:
-        - ucrt  # [win]
         - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
       run_constrained:
         # make sure we don't co-install with old version of previous package name
@@ -86,10 +90,8 @@ outputs:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - cmake
-        - ninja
+        - ninja-base
         - pkg-config
-        # only required for pkg-config test (which wants to find zlib.pc)
-        - zlib
       files:
         - cmake_test/
         - hello.proto
@@ -130,8 +132,8 @@ outputs:
 
         # test availability of symbol needed by arrow (esp. on windows)
         - cd cmake_test
-        - cmake -GNinja -DCMAKE_CXX_STANDARD=17 $CMAKE_ARGS .   # [unix]
-        - cmake -GNinja -DCMAKE_CXX_STANDARD=17 %CMAKE_ARGS% .  # [win]
+        - cmake -Gninja -DCMAKE_CXX_STANDARD=17 $CMAKE_ARGS .   # [unix]
+        - cmake -Gninja -DCMAKE_CXX_STANDARD=17 %CMAKE_ARGS% .  # [win]
         - cmake --build .
 
   - name: grpcio
@@ -150,8 +152,8 @@ outputs:
         - setuptools
         - cython <3
         - {{ pin_subpackage('libgrpc', exact=True) }}
-        - pthread-stubs                               # [linux]
-        - zlib
+        - pthread-stubs  0.3                     # [linux]
+        - zlib {{ zlib }}
       run:
         - python
         - {{ pin_subpackage('libgrpc', exact=True) }}

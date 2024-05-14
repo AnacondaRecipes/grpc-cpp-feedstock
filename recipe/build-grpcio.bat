@@ -13,5 +13,5 @@ set "GRPC_PYTHON_CFLAGS=/DPB_FIELD_16BIT /std:c++17"
 :: clearing this regenerates it with cython and fixes phtread usage
 del src\python\grpcio\grpc\_cython\cygrpc.cpp
 
-"%PYTHON%" -m pip install . --no-deps --ignore-installed --no-cache-dir -v
+"%PYTHON%" -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -v
 if %ERRORLEVEL% neq 0 exit 1
