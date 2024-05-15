@@ -132,8 +132,8 @@ outputs:
 
         # test availability of symbol needed by arrow (esp. on windows)
         - cd cmake_test
-        - cmake -Gninja -DCMAKE_CXX_STANDARD=17 $CMAKE_ARGS .   # [unix]
-        - cmake -Gninja -DCMAKE_CXX_STANDARD=17 %CMAKE_ARGS% .  # [win]
+        - cmake -GNinja -DCMAKE_CXX_STANDARD=17 $CMAKE_ARGS .   # [unix]
+        - cmake -GNinja -DCMAKE_CXX_STANDARD=17 %CMAKE_ARGS% .  # [win]
         - cmake --build .
 
   - name: grpcio
@@ -153,7 +153,6 @@ outputs:
         - cython <3
         - {{ pin_subpackage('libgrpc', exact=True) }}
         - pthread-stubs  0.3                     # [linux]
-        - zlib {{ zlib }}
       run:
         - python
         - {{ pin_subpackage('libgrpc', exact=True) }}
