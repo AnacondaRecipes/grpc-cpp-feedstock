@@ -56,6 +56,8 @@ outputs:
         # ensure that all dependent packages reflect that to
         # avoid the solver getting stuck in no-man's-land.
         - __osx >={{ MACOSX_DEPLOYMENT_TARGET }}  # [osx and x86_64]
+      missing_dso_whitelist:  # [s390x]
+        - $RPATH/ld64.so.1    # [s390x]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -139,6 +141,9 @@ outputs:
   - name: grpcio
     script: build-grpcio.sh  # [not win]
     script: build-grpcio.bat  # [win]
+    build:
+      missing_dso_whitelist:  # [s390x]
+        - $RPATH/ld64.so.1    # [s390x]
     requirements:
       build:
         - python                                 # [build_platform != target_platform]
