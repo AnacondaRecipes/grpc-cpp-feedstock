@@ -121,11 +121,12 @@ outputs:
         {% endfor %}
 
         # pkg-config (no metadata for vendored libs)
+        # a number of dependencies do not have pkgconfig files on windows. e.g. re2
         {% for each_lib in core_libs %}
-        - pkg-config --print-errors --exact-version "{{ core_version }}" {{ each_lib }}
+        - pkg-config --print-errors --exact-version "{{ core_version }}" {{ each_lib }} # [not win]
         {% endfor %}
         {% for each_lib in core_cpp_libs %}
-        - pkg-config --print-errors --exact-version "{{ version }}" {{ each_lib }}
+        - pkg-config --print-errors --exact-version "{{ version }}" {{ each_lib }} # [not win]
         {% endfor %}
 
         # CMake test: compile upstream example
