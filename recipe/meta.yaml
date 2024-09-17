@@ -9,9 +9,7 @@
 {% set core_libs = ["gpr", "grpc", "grpc_unsecure"] %}
 {% set core_cpp_libs = ["grpc++", "grpc++_unsecure"] %}
 {% set vendored_libs = ["address_sorting"] %}
-{% set binaries_plugin_langs = [
-    "cpp", "csharp", "node", "objective_c", "php", "python", "ruby"
-] %}
+{% set binaries_plugin_langs = [ "cpp", "csharp", "node", "objective_c", "php", "python", "ruby" ] %}
 
 {% if bootstrap is undefined %}
 {% set bootstrap = "no" %}
