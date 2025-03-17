@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+cp ${PREFIX}/lib/libre2.11.dylib ${PREFIX}/lib/libre2.dylib
+
 export CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_CXX_STANDARD=17"
 
 if [[ "$CONDA_BUILD_CROSS_COMPILATION" == 1 ]]; then
@@ -83,6 +85,7 @@ cmake -GNinja \
       -DgRPC_ABSL_PROVIDER="package" \
       -DgRPC_RE2_PROVIDER="package" \
       -DProtobuf_ROOT=$PREFIX \
+      -DGRPC_RE2_LIBRARY="${PREFIX}/lib/libre2.11.dylib" \
       ..
 
 ninja install
