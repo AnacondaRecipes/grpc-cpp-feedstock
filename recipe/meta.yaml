@@ -49,6 +49,8 @@ source:
 
 build:
   number: 0
+  # Latest protobuf is no longer available on s390x
+  skip: true  # [linux and s390x]
 
 requirements:
   build:
