@@ -77,6 +77,8 @@ outputs:
         - cmake
         - ninja-base
         - python        # [win]
+        # for analysing total number of symbols in grpc.dll
+        - py-lief       # [win]
         # During cross-compilation, we need to build the grpc_cpp_plugin for the
         # architecture of the build agent (where it will be executed afterwards),
         # thus we need the respective host dependencies also in the build env.
@@ -186,6 +188,7 @@ outputs:
       requires:
         - pip
         - protobuf
+        - grpcio-tools
       imports:
         - grpc
         - grpc._cython
@@ -205,10 +208,45 @@ outputs:
         # test actual RPC pattern (client & server); other tests did not catch
         # https://github.com/conda-forge/grpc-cpp-feedstock/issues/281
         - cd examples/python/helloworld
+        # generate helloworld, see https://grpc.io/docs/languages/python/quickstart/#generate-grpc-code
+        - python -m grpc_tools.protoc -I../../protos --python_out=. --pyi_out=. --grpc_python_out=. ../../protos/helloworld.proto
         # copy test defined in feedstock to where it needs to run
         - cp ../../../test_grpcio_helloworld.py .
         - python test_grpcio_helloworld.py
         {% endif %}
+  
+  - name: grpcio-tools
+    script: build-grpcio-tools.sh  # [not win]
+    script: build-grpcio-tools.bat  # [win]
+    requirements:
+      build:
+        - python                                 # [build_platform != target_platform]
+        - cython                                 # [build_platform != target_platform]
+        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
+        - python
+        - wheel
+        - cython
+        - pip
+        - setuptools
+        - libabseil 20250127.0
+        - libprotobuf 5.29.3
+      run:
+        - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
+        - python
+        - protobuf
+    test:
+      requires:
+        - pip
+      imports:
+        - grpc_tools
+      commands:
+        - pip check
+        # see https://github.com/conda-forge/grpc-cpp-feedstock/issues/385
+        - test "$(python -m grpc_tools.protoc --version)" == "$(protoc --version)"  # [unix]
 
 about:
   home: https://grpc.io/
