@@ -76,6 +76,7 @@ outputs:
         - {{ compiler('cxx') }}
         - cmake
         - ninja-base
+        - python        # [win]
         # During cross-compilation, we need to build the grpc_cpp_plugin for the
         # architecture of the build agent (where it will be executed afterwards),
         # thus we need the respective host dependencies also in the build env.
