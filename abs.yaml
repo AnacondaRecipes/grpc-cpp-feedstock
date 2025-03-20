@@ -1,8 +1,2 @@
-upload_without_merge: True
-channels:
-  - libprotobuf-5.29.3
-
-# Disable skip existing
-build_parameters:
-  - "--suppress-variables"
-  - "--error-overlinking"
+build_env_vars:
+  ANACONDA_ROCKET_ENABLE_PY313 : yes
