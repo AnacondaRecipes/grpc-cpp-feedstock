@@ -1,18 +1,18 @@
-From 5957c91f83b93c550266761cedfbcd747bf9dc18 Mon Sep 17 00:00:00 2001
+From f671ec44b769d0463dfae979d9e223400d49132c Mon Sep 17 00:00:00 2001
 From: Marius van Niekerk <marius.v.niekerk@gmail.com>
 Date: Mon, 13 Jun 2022 17:13:07 -0400
-Subject: [PATCH 03/10] Link against grpc
+Subject: [PATCH 03/15] Link against grpc and abseil
 
 Co-Authored-By: H. Vetinari <h.vetinari@gmx.com>
 ---
- setup.py | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ setup.py | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index dfe4c9caa7..d410af9006 100644
+index 0458773b5b..9d6b47a57e 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -179,6 +179,8 @@ BUILD_WITH_STATIC_LIBSTDCXX = _env_bool_value(
+@@ -180,6 +180,8 @@ BUILD_WITH_STATIC_LIBSTDCXX = _env_bool_value(
      "GRPC_PYTHON_BUILD_WITH_STATIC_LIBSTDCXX", "False"
  )
  
@@ -21,20 +21,31 @@ index dfe4c9caa7..d410af9006 100644
  # For local development use only: This skips building gRPC Core and its
  # dependencies, including protobuf and boringssl. This allows "incremental"
  # compilation by first building gRPC Core using make, then building only the
-@@ -364,6 +366,12 @@ if BUILD_WITH_SYSTEM_ABSL:
-     EXTENSION_LIBRARIES += tuple(
-         lib.stem[3:] for lib in pathlib.Path("/usr").glob("lib*/libabsl_*.so")
-     )
+@@ -378,10 +380,19 @@ if BUILD_WITH_SYSTEM_CARES:
+ if BUILD_WITH_SYSTEM_RE2:
+     EXTENSION_LIBRARIES += ("re2",)
+ if BUILD_WITH_SYSTEM_ABSL:
+-    EXTENSION_LIBRARIES += tuple(
+-        lib.stem[3:]
+-        for lib in sorted(pathlib.Path("/usr").glob("lib*/libabsl_*.so"))
+-    )
++    if "win32" in sys.platform:
++        absl_libs = (
++            'abseil_dll', 'absl_log_flags', 'absl_flags_commandlineflag', 'absl_flags_commandlineflag_internal',
++            'absl_flags_config', 'absl_flags_internal', 'absl_flags_marshalling', 'absl_flags_parse',
++            'absl_flags_private_handle_accessor', 'absl_flags_program_name', 'absl_flags_reflection',
++            'absl_flags_usage', 'absl_flags_usage_internal',
++        )
++    else:
++        absl_glob = pathlib.Path(os.environ['PREFIX']).glob('lib/libabsl_*.so')
++        absl_libs = tuple(lib.stem[3:] for lib in absl_glob)
++    EXTENSION_LIBRARIES += absl_libs
 +if BUILD_WITH_SYSTEM_GRPC_CORE:
 +    EXTENSION_LIBRARIES += ('gpr', 'grpc', )
-+    if "win32" in sys.platform:
-+        EXTENSION_LIBRARIES += ('libprotoc', 'libprotobuf', 'address_sorting',)
-+        EXTENSION_LIBRARIES += tuple(f'upb_{x}_lib' for x in ["base", "json", "mem", "message", "textformat"])
-+        EXTENSION_LIBRARIES += tuple(lib.stem for lib in pathlib.Path(os.environ['LIBRARY_LIB']).glob('absl_*.lib'))
  
  DEFINE_MACROS = (("_WIN32_WINNT", 0x600),)
  asm_files = []
-@@ -486,6 +494,9 @@ def cython_extensions_and_necessity():
+@@ -493,6 +504,9 @@ def cython_extensions_and_necessity():
              prefix + "libgrpc.a",
          ]
          core_c_files = []

@@ -8,6 +8,7 @@ export GRPC_PYTHON_BUILD_SYSTEM_RE2="True"
 export GRPC_PYTHON_BUILD_SYSTEM_ZLIB="True"
 export GRPC_PYTHON_BUILD_WITH_CYTHON="True"
 export GRPC_PYTHON_USE_PREBUILT_GRPC_CORE=""
+export GRPC_RE2_LIBRARY="${PREFIX}/lib/libre2.${SHLIB_EXT}"
 
 if [[ "${target_platform}" == linux-* ]]; then
     # set these so the default in setup.py are not used

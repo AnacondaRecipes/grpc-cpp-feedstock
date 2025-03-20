@@ -83,6 +83,7 @@ cmake -GNinja \
       -DgRPC_ABSL_PROVIDER="package" \
       -DgRPC_RE2_PROVIDER="package" \
       -DProtobuf_ROOT=$PREFIX \
+      -DGRPC_RE2_LIBRARY="${PREFIX}/lib/libre2.${SHLIB_EXT}" \
       ..
 
 ninja install
