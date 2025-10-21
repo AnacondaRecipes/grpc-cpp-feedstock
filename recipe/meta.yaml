@@ -84,7 +84,7 @@ outputs:
         - zlib          # [build_platform != target_platform]
       host:
         - libabseil 20250127.1
-        - c-ares {{ c-ares }}
+        - c-ares {{ c_ares }}
         - libprotobuf {{ libprotobuf }}
         - re2 {{ re2 }}
         - openssl {{ openssl }}
