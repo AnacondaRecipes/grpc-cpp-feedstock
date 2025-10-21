@@ -48,14 +48,7 @@ source:
     - patches/0015-update-GRPC_DLL-instances-where-necessary.patch
 
 build:
-  number: 0
-  # Latest protobuf is no longer available on s390x
-  skip: true  # [linux and s390x]
-
-requirements:
-  build:
-    - patch # [unix]
-    - m2-patch # [win]
+  number: 1
 
 outputs:
   - name: libgrpc
@@ -74,6 +67,7 @@ outputs:
       build:
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
+        - {{ stdlib('c') }}
         - cmake
         - ninja-base
         - python        # [win]
@@ -89,10 +83,10 @@ outputs:
         - re2           # [build_platform != target_platform]
         - zlib          # [build_platform != target_platform]
       host:
-        - libabseil 20250127.0
-        - c-ares 1.19.1
-        - libprotobuf 5.29.3
-        - re2 2024.07.02
+        - libabseil 20250127.1
+        - c-ares {{ c-ares }}
+        - libprotobuf {{ libprotobuf }}
+        - re2 {{ re2 }}
         - openssl {{ openssl }}
         - zlib {{ zlib }}
       run:
@@ -106,6 +100,7 @@ outputs:
         # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
+        - {{ stdlib('c') }}
         - cmake
         - ninja-base
         - pkg-config
@@ -168,6 +163,7 @@ outputs:
         - cython                                 # [build_platform != target_platform]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
+        - {{ stdlib('c') }}
       host:
         - python
         - pip
@@ -225,6 +221,7 @@ outputs:
         - cross-python_{{ target_platform }}     # [build_platform != target_platform]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
+        - {{ stdlib('c') }}
       host:
         - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
         - python
@@ -232,8 +229,8 @@ outputs:
         - cython
         - pip
         - setuptools
-        - libabseil 20250127.0
-        - libprotobuf 5.29.3
+        - libabseil 20250127.1
+        - libprotobuf {{ libprotobuf }}
       run:
         - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
         - python
