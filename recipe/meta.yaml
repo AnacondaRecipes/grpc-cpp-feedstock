@@ -222,7 +222,8 @@ outputs:
       run:
         - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
         - python
-        - protobuf
+        - setuptools
+        - protobuf >=6.31.1,<7.0.0
     test:
       requires:
         - pip
