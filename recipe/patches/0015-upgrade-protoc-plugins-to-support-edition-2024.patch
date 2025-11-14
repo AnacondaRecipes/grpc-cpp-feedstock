@@ -1,0 +1,94 @@
+From e153b5a64694bbefc5ca0f53784a6ac0f971366e Mon Sep 17 00:00:00 2001
+From: Mike Kruskal <mkruskal@google.com>
+Date: Sat, 8 Nov 2025 12:18:25 -0800
+Subject: [PATCH] [proto compiler] Upgrade protoc plugins to support protobuf
+ edition 2024
+
+PiperOrigin-RevId: 829866922
+---
+ src/compiler/cpp_plugin.h          | 2 +-
+ src/compiler/csharp_plugin.cc      | 2 +-
+ src/compiler/objective_c_plugin.cc | 2 +-
+ src/compiler/php_plugin.cc         | 2 +-
+ src/compiler/python_generator.h    | 2 +-
+ src/compiler/ruby_plugin.cc        | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/compiler/cpp_plugin.h b/src/compiler/cpp_plugin.h
+index 8ae6d7e6c4cba..21e9dc899e4c4 100644
+--- a/src/compiler/cpp_plugin.h
++++ b/src/compiler/cpp_plugin.h
+@@ -45,7 +45,7 @@ class CppGrpcGenerator : public grpc::protobuf::compiler::CodeGenerator {
+     return grpc::protobuf::Edition::EDITION_PROTO2;
+   }
+   grpc::protobuf::Edition GetMaximumEdition() const override {
+-    return grpc::protobuf::Edition::EDITION_2023;
++    return grpc::protobuf::Edition::EDITION_2024;
+   }
+ #endif
+ 
+diff --git a/src/compiler/csharp_plugin.cc b/src/compiler/csharp_plugin.cc
+index a7a2e74deb983..6625919f7e422 100644
+--- a/src/compiler/csharp_plugin.cc
++++ b/src/compiler/csharp_plugin.cc
+@@ -42,7 +42,7 @@ class CSharpGrpcGenerator : public grpc::protobuf::compiler::CodeGenerator {
+     return grpc::protobuf::Edition::EDITION_PROTO2;
+   }
+   grpc::protobuf::Edition GetMaximumEdition() const override {
+-    return grpc::protobuf::Edition::EDITION_2023;
++    return grpc::protobuf::Edition::EDITION_2024;
+   }
+ #endif
+ 
+diff --git a/src/compiler/objective_c_plugin.cc b/src/compiler/objective_c_plugin.cc
+index 250df04220d25..8aa66cf801aab 100644
+--- a/src/compiler/objective_c_plugin.cc
++++ b/src/compiler/objective_c_plugin.cc
+@@ -93,7 +93,7 @@ class ObjectiveCGrpcGenerator : public grpc::protobuf::compiler::CodeGenerator {
+     return grpc::protobuf::Edition::EDITION_PROTO2;
+   }
+   grpc::protobuf::Edition GetMaximumEdition() const override {
+-    return grpc::protobuf::Edition::EDITION_2023;
++    return grpc::protobuf::Edition::EDITION_2024;
+   }
+ #endif
+ 
+diff --git a/src/compiler/php_plugin.cc b/src/compiler/php_plugin.cc
+index 9fafe52678c3b..b3fa2c2145334 100644
+--- a/src/compiler/php_plugin.cc
++++ b/src/compiler/php_plugin.cc
+@@ -46,7 +46,7 @@ class PHPGrpcGenerator : public grpc::protobuf::compiler::CodeGenerator {
+     return grpc::protobuf::Edition::EDITION_PROTO2;
+   }
+   grpc::protobuf::Edition GetMaximumEdition() const override {
+-    return grpc::protobuf::Edition::EDITION_2023;
++    return grpc::protobuf::Edition::EDITION_2024;
+   }
+ #endif
+ 
+diff --git a/src/compiler/python_generator.h b/src/compiler/python_generator.h
+index 1ea0e0a096848..0d5a785ef2ee2 100644
+--- a/src/compiler/python_generator.h
++++ b/src/compiler/python_generator.h
+@@ -59,7 +59,7 @@ class PythonGrpcGenerator : public grpc::protobuf::compiler::CodeGenerator {
+     return grpc::protobuf::Edition::EDITION_PROTO2;
+   }
+   grpc::protobuf::Edition GetMaximumEdition() const override {
+-    return grpc::protobuf::Edition::EDITION_2023;
++    return grpc::protobuf::Edition::EDITION_2024;
+   }
+ #endif
+ 
+diff --git a/src/compiler/ruby_plugin.cc b/src/compiler/ruby_plugin.cc
+index c70206c6b3736..51ed178eab6ca 100644
+--- a/src/compiler/ruby_plugin.cc
++++ b/src/compiler/ruby_plugin.cc
+@@ -42,7 +42,7 @@ class RubyGrpcGenerator : public grpc::protobuf::compiler::CodeGenerator {
+     return grpc::protobuf::Edition::EDITION_PROTO2;
+   }
+   grpc::protobuf::Edition GetMaximumEdition() const override {
+-    return grpc::protobuf::Edition::EDITION_2023;
++    return grpc::protobuf::Edition::EDITION_2024;
+   }
+ #endif
+ 
