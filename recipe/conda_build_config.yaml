@@ -2,7 +2,7 @@ libabseil: 20250814.1
 re2: 2025.11.05
 libprotobuf: 6.33.0
 openssl: 3
-
+zlib: 1.2
 c_compiler:     # [win]
   - vs2022      # [win]
 cxx_compiler:   # [win]
