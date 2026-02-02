@@ -8,26 +8,48 @@ from that TU in ValidatePemKeyCertPair, see
 https://github.com/grpc/grpc/blob/v1.69.0/src/core/lib/security/credentials/tls/grpc_tls_certificate_provider.cc#L66
 https://github.com/grpc/grpc/blob/v1.69.0/src/core/tsi/ssl_transport_security_utils.cc#L380
 ---
- CMakeLists.txt | 2 ++
- 1 file changed, 2 insertions(+)
+ CMakeLists.txt | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b44b6fe124..b28c5a7318 100644
+index e5d96a3e59..8389174eab 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -3091,6 +3091,7 @@ add_library(grpc_unsecure
+@@ -2794,6 +2794,8 @@ add_library(grpc_unsecure
+   src/core/credentials/transport/tls/load_system_roots_fallback.cc
+   src/core/credentials/transport/tls/load_system_roots_supported.cc
+   src/core/credentials/transport/tls/load_system_roots_windows.cc
++  src/core/credentials/transport/tls/spiffe_utils.cc
++  src/core/credentials/transport/tls/ssl_utils.cc
+   src/core/credentials/transport/tls/tls_utils.cc
+   src/core/credentials/transport/transport_credentials.cc
+   src/core/ext/filters/backend_metrics/backend_metric_filter.cc
+@@ -2809,6 +2811,7 @@ add_library(grpc_unsecure
+   src/core/ext/filters/http/server/http_server_filter.cc
+   src/core/ext/filters/message_size/message_size_filter.cc
+   src/core/ext/transport/chttp2/chttp2_plugin.cc
++  src/core/ext/transport/chttp2/alpn/alpn.cc
+   src/core/ext/transport/chttp2/client/chttp2_connector.cc
+   src/core/ext/transport/chttp2/server/chttp2_server.cc
+   src/core/ext/transport/chttp2/transport/bin_decoder.cc
+@@ -3145,6 +3148,12 @@ add_library(grpc_unsecure
    src/core/tsi/alts/handshaker/transport_security_common_api.cc
    src/core/tsi/fake_transport_security.cc
    src/core/tsi/local_transport_security.cc
++  src/core/tsi/ssl_transport_security.cc
 +  src/core/tsi/ssl_transport_security_utils.cc
++  src/core/tsi/ssl/key_logging/ssl_key_logging.cc
++  src/core/tsi/ssl/session_cache/ssl_session_cache.cc
++  src/core/tsi/ssl/session_cache/ssl_session_boringssl.cc
++  src/core/tsi/ssl/session_cache/ssl_session_openssl.cc
    src/core/tsi/transport_security.cc
    src/core/tsi/transport_security_grpc.cc
    src/core/util/backoff.cc
-@@ -3169,6 +3170,7 @@ target_link_libraries(grpc_unsecure
+@@ -3225,6 +3234,7 @@ target_link_libraries(grpc_unsecure
    PRIVATE ${_gRPC_ZLIB_LIBRARIES}
    PRIVATE ${_gRPC_CARES_LIBRARIES}
    # external dependencies that need to available at runtime
 +  PUBLIC  ${_gRPC_SSL_LIBRARIES}
    PRIVATE absl::algorithm_container
-   PRIVATE absl::config
    PRIVATE absl::no_destructor
+   PRIVATE absl::btree

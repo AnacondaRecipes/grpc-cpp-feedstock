@@ -13,10 +13,10 @@ Co-Authored-By: Mark Harfouche <mark.harfouche@gmail.com>
  1 file changed, 60 insertions(+), 50 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f652a4055c..2fae60378f 100644
+index bc86c00463..f716e49ed6 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -3069,35 +3069,40 @@ target_include_directories(grpc
+@@ -3127,35 +3127,40 @@ target_include_directories(grpc
      ${_gRPC_ZLIB_INCLUDE_DIR}
  )
  target_link_libraries(grpc
@@ -26,12 +26,12 @@ index f652a4055c..2fae60378f 100644
 -  ${_gRPC_RE2_LIBRARIES}
 -  ${_gRPC_ZLIB_LIBRARIES}
 -  absl::algorithm_container
--  absl::config
 -  absl::no_destructor
 -  absl::btree
 -  absl::flat_hash_map
 -  absl::flat_hash_set
 -  absl::inlined_vector
+-  absl::node_hash_map
 -  absl::bind_front
 -  absl::function_ref
 -  absl::hash
@@ -59,12 +59,12 @@ index f652a4055c..2fae60378f 100644
 +  # external dependencies that need to available at runtime
 +  PUBLIC  ${_gRPC_SSL_LIBRARIES}
 +  PRIVATE absl::algorithm_container
-+  PRIVATE absl::config
 +  PRIVATE absl::no_destructor
 +  PRIVATE absl::btree
 +  PRIVATE absl::flat_hash_map
 +  PRIVATE absl::flat_hash_set
 +  PRIVATE absl::inlined_vector
++  PRIVATE absl::node_hash_map
 +  PRIVATE absl::bind_front
 +  PRIVATE absl::function_ref
 +  PRIVATE absl::hash
@@ -84,7 +84,7 @@ index f652a4055c..2fae60378f 100644
  endif()
  
  foreach(_hdr
-@@ -3791,32 +3796,37 @@ target_include_directories(grpc_unsecure
+@@ -3860,32 +3865,37 @@ target_include_directories(grpc_unsecure
      ${_gRPC_ZLIB_INCLUDE_DIR}
  )
  target_link_libraries(grpc_unsecure
@@ -96,12 +96,12 @@ index f652a4055c..2fae60378f 100644
    upb_textformat_lib
 -  ${_gRPC_ZLIB_LIBRARIES}
 -  absl::algorithm_container
--  absl::config
 -  absl::no_destructor
 -  absl::btree
 -  absl::flat_hash_map
 -  absl::flat_hash_set
 -  absl::inlined_vector
+-  absl::node_hash_map
 -  absl::bind_front
 -  absl::function_ref
 -  absl::hash
@@ -120,12 +120,12 @@ index f652a4055c..2fae60378f 100644
 +  PRIVATE ${_gRPC_CARES_LIBRARIES}
 +  # external dependencies that need to available at runtime
 +  PRIVATE absl::algorithm_container
-+  PRIVATE absl::config
 +  PRIVATE absl::no_destructor
 +  PRIVATE absl::btree
 +  PRIVATE absl::flat_hash_map
 +  PRIVATE absl::flat_hash_set
 +  PRIVATE absl::inlined_vector
++  PRIVATE absl::node_hash_map
 +  PRIVATE absl::bind_front
 +  PRIVATE absl::function_ref
 +  PRIVATE absl::hash

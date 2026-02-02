@@ -1,4 +1,4 @@
-{% set version = "1.74.1" %}
+{% set version = "1.76.0" %}
 
 # core package & vendored libs use different version scheme than CPP libs, see
 # top of https://github.com/grpc/grpc/blob/v{{ version }}/CMakeLists.txt
@@ -19,7 +19,7 @@ package:
 
 source:
   url: https://github.com/grpc/grpc/archive/v{{ version.replace(".pre", "-pre") }}.tar.gz
-  sha256: 7bf97c11cf3808d650a3a025bbf9c5f922c844a590826285067765dfd055d228
+  sha256: 0af37b800953130b47c075b56683ee60bdc3eda3c37fc6004193f5b569758204
   patches:
     - patches/0001-windows-ssl-lib-names.patch
     - patches/0002-fix-win-setup-cmds.patch
@@ -66,19 +66,10 @@ outputs:
         - ninja-base
         - python        # [win]
         # for analysing total number of symbols in grpc.dll
-        - py-lief       # [win]
-        # During cross-compilation, we need to build the grpc_cpp_plugin for the
-        # architecture of the build agent (where it will be executed afterwards),
-        # thus we need the respective host dependencies also in the build env.
-        - c-ares        # [build_platform != target_platform]
-        - libabseil     # [build_platform != target_platform]
-        - libprotobuf   # [build_platform != target_platform]
-        - openssl       # [build_platform != target_platform]
-        - re2           # [build_platform != target_platform]
-        - zlib          # [build_platform != target_platform]
+        - py-lief       # [win]   
       host:
         - libabseil {{ libabseil }}
-        - c-ares 1.19.1
+        - c-ares 1.34.6
         - libprotobuf {{ libprotobuf }}
         - re2 {{ re2 }}
         - openssl {{ openssl }}
@@ -96,7 +87,7 @@ outputs:
         - cmake
         - ninja-base
         - pkg-config
-        - re2 {{ re2 }}
+        - re2
       files:
         - cmake_test/
         - hello.proto
@@ -147,9 +138,6 @@ outputs:
     script: build-grpcio.bat  # [win]
     requirements:
       build:
-        - python                                 # [build_platform != target_platform]
-        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-        - cython                                 # [build_platform != target_platform]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - {{ stdlib('c') }}
@@ -157,12 +145,15 @@ outputs:
         - python
         - pip
         - setuptools
-        - cython
+        # cython from 3.1.4 support python 3.14
+        - cython >=3.1.4
         - {{ pin_subpackage('libgrpc', exact=True) }}
         - pthread-stubs  0.3                     # [linux]
       run:
         - python
         - {{ pin_subpackage('libgrpc', exact=True) }}
+        - typing-extensions
+        - libabseil
     test:
       source_files:
         - examples/
@@ -205,9 +196,6 @@ outputs:
     script: build-grpcio-tools.bat  # [win]
     requirements:
       build:
-        - python                                 # [build_platform != target_platform]
-        - cython                                 # [build_platform != target_platform]
-        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
         - {{ stdlib('c') }}
@@ -236,7 +224,7 @@ outputs:
         - test "$(python -m grpc_tools.protoc --version)" == "$(protoc --version)"  # [unix]
 
 about:
-  home: https://grpc.io/
+  home: https://grpc.io
   license: Apache-2.0
   license_family: APACHE
   license_file: LICENSE
@@ -249,7 +237,7 @@ about:
 
     This package contains the gRPC C++ libraries and header files, as well
     as the code generation plugins.
-  doc_url: https://grpc.io/docs/
+  doc_url: https://grpc.io/docs
   dev_url: https://github.com/grpc/grpc
 
 extra:

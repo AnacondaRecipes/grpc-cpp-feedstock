@@ -47,6 +47,16 @@ output_file = sys.argv[2]  # grpc.def
 # ```
 
 symbols = set()
+
+# Exceptions which is required but contain ? symbol
+required_symbols = {
+    "??0DomainStorage@instrument_detail@grpc_core@@QEAA@PEAVQueryableDomain@12@V?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@@Z",
+    "??0HighContentionBackend@grpc_core@@QEAA@_K@Z",
+    "?grpc_socket_mutator_to_arg@@YA?AUgrpc_arg@@PEAUgrpc_socket_mutator@@@Z",
+    "?IsRootCertInfoEmpty@@YA_NPEBV?$variant@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@VSpiffeBundleMap@grpc_core@@@std@@@Z",
+    "??1SpiffeBundle@grpc_core@@QEAA@XZ",
+    "?FromFile@SpiffeBundleMap@grpc_core@@SA?AV?$StatusOr@VSpiffeBundleMap@grpc_core@@@lts_20250814@absl@@V?$basic_string_view@DU?$char_traits@D@std@@@std@@@Z"
+}
 for txt_file in glob.glob(os.path.join(symbols_dir, "symbols_*.txt")):
     with open(txt_file, "r") as f:
         for line in f:
@@ -78,6 +88,7 @@ for txt_file in glob.glob(os.path.join(symbols_dir, "symbols_*.txt")):
             # # Skip static pdata/dtors/initializers tied to functions
             # if any(x in line for x in ["$pdata$", "$dtor$", "$initializer$"]):
             #    continue
+symbols.update(required_symbols)
 
 out_lines = ["EXPORTS"] + [f"    {x}" for x in sorted(list(symbols))] + [""]
 

@@ -34,14 +34,14 @@ filter as aggressively as possible (e.g. lambdas), because our main goal is to g
 limit, and indeed, we end up <25k, and we don't want to remove symbols over-zealously if some
 other consumers end up linking to them.
 ---
- CMakeLists.txt | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ CMakeLists.txt | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b28c5a7318..53133fe185 100644
+index 74cddf98e8..b6a127c8af 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -2401,6 +2401,30 @@ add_library(grpc
+@@ -2446,6 +2446,30 @@ add_library(grpc
    src/core/xds/xds_client/xds_client.cc
  )
  
@@ -72,3 +72,28 @@ index b28c5a7318..53133fe185 100644
  target_compile_features(grpc PUBLIC cxx_std_17)
  
  set_target_properties(grpc PROPERTIES
+@@ -3194,8 +3218,24 @@ if(WIN32 AND MSVC)
+     COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+   )
+   if(BUILD_SHARED_LIBS)
++    set_target_properties(grpc_unsecure PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS OFF)
+     set_target_properties(grpc_unsecure PROPERTIES DEFINE_SYMBOL "GRPC_DLL_EXPORTS")
+     target_compile_definitions(grpc_unsecure INTERFACE "GRPC_DLL_IMPORTS")
++    add_custom_command(
++      TARGET grpc_unsecure
++      PRE_LINK
++      COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/symbols_unsecure"
++      COMMAND for %%f in ($<TARGET_OBJECTS:grpc_unsecure>) do dumpbin /symbols %%f > ${CMAKE_CURRENT_BINARY_DIR}/symbols_unsecure/symbols_%%~nf.txt
++      COMMAND $ENV{BUILD_PREFIX}/python ${CMAKE_SOURCE_DIR}/generate_def.py ${CMAKE_CURRENT_BINARY_DIR}/symbols_unsecure ${CMAKE_CURRENT_BINARY_DIR}/grpc_unsecure.def
++      BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/grpc_unsecure.def
++      COMMENT "Generating grpc_unsecure.def from object files"
++      VERBATIM
++      USES_TERMINAL
++    )
++    
++    set_target_properties(grpc_unsecure PROPERTIES
++      LINK_FLAGS "/DEF:${CMAKE_CURRENT_BINARY_DIR}/grpc_unsecure.def"
++    )
+   endif()
+   if(gRPC_INSTALL)
+     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/grpc_unsecure.pdb
