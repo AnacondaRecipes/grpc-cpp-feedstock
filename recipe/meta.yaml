@@ -203,7 +203,8 @@ outputs:
         - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
         - python
         - wheel
-        - cython
+        # cython from 3.1.4 support python 3.14
+        - cython >=3.1.4
         - pip
         - setuptools
         - libabseil {{ libabseil }}
