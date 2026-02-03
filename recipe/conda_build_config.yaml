@@ -3,3 +3,4 @@ re2: 2025.11.05
 libprotobuf: 6.33.0
 openssl: 3
 zlib: 1.2
+c_ares: 1

@@ -47,22 +47,15 @@ output_file = sys.argv[2]  # grpc.def
 # ```
 
 symbols = set()
-
-# Exceptions which is required but contain ? symbol
-required_symbols = {
-    "??0DomainStorage@instrument_detail@grpc_core@@QEAA@PEAVQueryableDomain@12@V?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@@Z",
-    "??0HighContentionBackend@grpc_core@@QEAA@_K@Z",
-    "?grpc_socket_mutator_to_arg@@YA?AUgrpc_arg@@PEAUgrpc_socket_mutator@@@Z",
-    "?IsRootCertInfoEmpty@@YA_NPEBV?$variant@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@VSpiffeBundleMap@grpc_core@@@std@@@Z",
-    "??1SpiffeBundle@grpc_core@@QEAA@XZ",
-    "?FromFile@SpiffeBundleMap@grpc_core@@SA?AV?$StatusOr@VSpiffeBundleMap@grpc_core@@@lts_20250814@absl@@V?$basic_string_view@DU?$char_traits@D@std@@@std@@@Z"
-}
+# Symbol ?grpc_socket_mutator_unref@@YAXPEAUgrpc_socket_mutator@@@Z is needed, although it is UNDEF
+required_symbols = {"?grpc_socket_mutator_to_arg@@YA?AUgrpc_arg@@PEAUgrpc_socket_mutator@@@Z"}
 for txt_file in glob.glob(os.path.join(symbols_dir, "symbols_*.txt")):
     with open(txt_file, "r") as f:
         for line in f:
             # we only want symbols (filter to lines with "|")
             if "|" not in line:
                 continue
+
             # filter out UNDEF symbols that are not present in the object,
             # i.e. supposed to come from another library (it could also be
             # from another object, but since we do a union, it doesn't matter);
@@ -74,6 +67,10 @@ for txt_file in glob.glob(os.path.join(symbols_dir, "symbols_*.txt")):
             # trailing demangled names (e.g. "(`upb_FieldType_CType'::`2'::c_type)" above);
             # don't use [-1] because some demangled symbols contain `operator|`
             symbol = line.split("|")[1].strip().split()[0]
+
+            if any(symbol.startswith(x) for x in ["??0", "??1"]):
+                symbols.add(symbol)
+                continue
             # skip labels and metadata
             if "Label" in line or any(symbol.startswith(x) for x in [".", "$", "@", "??", "?$", "__"]):
                 continue
@@ -89,8 +86,8 @@ for txt_file in glob.glob(os.path.join(symbols_dir, "symbols_*.txt")):
             # if any(x in line for x in ["$pdata$", "$dtor$", "$initializer$"]):
             #    continue
 symbols.update(required_symbols)
-
 out_lines = ["EXPORTS"] + [f"    {x}" for x in sorted(list(symbols))] + [""]
 
 with open(output_file, "w") as def_file:
     def_file.write("\n".join(out_lines))
+
