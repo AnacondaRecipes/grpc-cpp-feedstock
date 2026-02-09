@@ -14,6 +14,7 @@ if [[ "${target_platform}" == linux-* ]]; then
     # set these so the default in setup.py are not used
     # it seems that we need to link to pthread on linux or osx.
     export GRPC_PYTHON_LDFLAGS="-lpthread"
+    export CXXFLAGS="$CXXFLAGS -fpermissive"
 elif [[ "$target_platform" == osx-* ]]; then
     export GRPC_PYTHON_LDFLAGS=" -framework CoreFoundation"
 fi
