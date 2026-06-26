@@ -46,9 +46,14 @@ source:
     - patches/0013-update-GRPC_DLL-instances-where-necessary.patch
     - patches/0014-use-protobuf-s-libutf8_range.patch
     - patches/0015-disable-grpc-_unsecure.patch
-
+    # backport https://github.com/grpc/grpc/pull/41639
+    - patches/0016-resolve-absl-initializelog-warning.patch
+    # backport https://github.com/grpc/grpc/pull/41909
+    - patches/0017-break-out-_initialize_absl-into-separate-cython-modu.patch
+    # backport https://github.com/grpc/grpc/pull/41910
+    - patches/0018-fix-double-metric-registration-across-shared-librari.patch
 build:
-  number: 0
+  number: 1
 
 outputs:
   - name: libgrpc
