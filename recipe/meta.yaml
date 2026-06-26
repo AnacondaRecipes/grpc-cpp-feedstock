@@ -6,13 +6,6 @@
 {% set core_major = version.split(".")[1] | int - 26 %}
 {% set core_version = core_major | string ~ ".0.0" %}
 
-{% set core_libs = ["gpr", "grpc"] %}
-{% set core_cpp_libs = ["grpc++"] %}
-{% set vendored_libs = ["address_sorting"] %}
-{% set binaries_plugin_langs = [
-    "cpp", "csharp", "node", "objective_c", "php", "python", "ruby"
-] %}
-
 package:
   name: grpc-split
   version: {{ version }}
@@ -46,9 +39,14 @@ source:
     - patches/0013-update-GRPC_DLL-instances-where-necessary.patch
     - patches/0014-use-protobuf-s-libutf8_range.patch
     - patches/0015-disable-grpc-_unsecure.patch
-
+    # backport https://github.com/grpc/grpc/pull/41639
+    - patches/0016-resolve-absl-initializelog-warning.patch
+    # backport https://github.com/grpc/grpc/pull/41909
+    - patches/0017-break-out-_initialize_absl-into-separate-cython-modu.patch
+    # backport https://github.com/grpc/grpc/pull/41910
+    - patches/0018-fix-double-metric-registration-across-shared-librari.patch
 build:
-  number: 0
+  number: 1
 
 outputs:
   - name: libgrpc
@@ -97,41 +95,55 @@ outputs:
         - examples/
       commands:
         # libraries
-        {% for each_lib in core_libs + core_cpp_libs + vendored_libs %}
         # presence of shared libs
-        - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
-        - test -f $PREFIX/lib/lib{{ each_lib }}.dylib           # [osx]
-        - if not exist %LIBRARY_BIN%\{{ each_lib }}.dll exit 1  # [win]
-        - if not exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1  # [win]
+        - test -f $PREFIX/lib/libgpr$SHLIB_EXT                     # [unix]
+        - if not exist %LIBRARY_BIN%\gpr.dll exit 1                 # [win]
+        - if not exist %LIBRARY_LIB%\gpr.lib exit 1                 # [win]
+        - test -f $PREFIX/lib/libgrpc$SHLIB_EXT                    # [unix]
+        - if not exist %LIBRARY_BIN%\grpc.dll exit 1                # [win]
+        - if not exist %LIBRARY_LIB%\grpc.lib exit 1                # [win]
+        - test -f $PREFIX/lib/libgrpc++$SHLIB_EXT                  # [unix]
+        - if not exist %LIBRARY_BIN%\grpc++.dll exit 1              # [win]
+        - if not exist %LIBRARY_LIB%\grpc++.lib exit 1              # [win]
+        - test -f $PREFIX/lib/libaddress_sorting$SHLIB_EXT          # [unix]
+        - if not exist %LIBRARY_BIN%\address_sorting.dll exit 1     # [win]
+        - if not exist %LIBRARY_LIB%\address_sorting.lib exit 1     # [win]
 
         # absence of grpc{,++}_unsecure
-        - test ! -f $PREFIX/lib/libgrpc_unsecure.so             # [linux]
-        - test ! -f $PREFIX/lib/libgrpc++_unsecure.so           # [linux]
-        - test ! -f $PREFIX/lib/libgrpc_unsecure.dylib          # [osx]
-        - test ! -f $PREFIX/lib/libgrpc++_unsecure.dylib        # [osx]
-        - if exist %LIBRARY_BIN%\grpc_unsecure.dll exit 1       # [win]
-        - if exist %LIBRARY_BIN%\grpc++_unsecure.dll exit 1     # [win]
-        - if exist %LIBRARY_LIB%\grpc_unsecure.lib exit 1       # [win]
-        - if exist %LIBRARY_LIB%\grpc++_unsecure.lib exit 1     # [win]
+        - test ! -f $PREFIX/lib/libgrpc_unsecure$SHLIB_EXT           # [unix]
+        - test ! -f $PREFIX/lib/libgrpc++_unsecure$SHLIB_EXT         # [unix]
+        - if exist %LIBRARY_BIN%\grpc_unsecure.dll exit 1           # [win]
+        - if exist %LIBRARY_BIN%\grpc++_unsecure.dll exit 1         # [win]
+        - if exist %LIBRARY_LIB%\grpc_unsecure.lib exit 1           # [win]
+        - if exist %LIBRARY_LIB%\grpc++_unsecure.lib exit 1         # [win]
 
         # absence of static libs (unix)
-        - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
-        {% endfor %}
+        - test ! -f $PREFIX/lib/libgpr.a                            # [unix]
+        - test ! -f $PREFIX/lib/libgrpc.a                           # [unix]
+        - test ! -f $PREFIX/lib/libgrpc++.a                         # [unix]
+        - test ! -f $PREFIX/lib/libaddress_sorting.a                # [unix]
 
         # binaries
-        {% for each_lang in binaries_plugin_langs %}
-        - test -f $PREFIX/bin/grpc_{{ each_lang }}_plugin                    # [unix]
-        - if not exist %LIBRARY_BIN%\grpc_{{ each_lang }}_plugin.exe exit 1  # [win]
-        {% endfor %}
+        - test -f $PREFIX/bin/grpc_cpp_plugin                       # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_cpp_plugin.exe exit 1     # [win]
+        - test -f $PREFIX/bin/grpc_csharp_plugin                    # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_csharp_plugin.exe exit 1  # [win]
+        - test -f $PREFIX/bin/grpc_node_plugin                      # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_node_plugin.exe exit 1    # [win]
+        - test -f $PREFIX/bin/grpc_objective_c_plugin               # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_objective_c_plugin.exe exit 1  # [win]
+        - test -f $PREFIX/bin/grpc_php_plugin                       # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_php_plugin.exe exit 1     # [win]
+        - test -f $PREFIX/bin/grpc_python_plugin                    # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_python_plugin.exe exit 1  # [win]
+        - test -f $PREFIX/bin/grpc_ruby_plugin                      # [unix]
+        - if not exist %LIBRARY_BIN%\grpc_ruby_plugin.exe exit 1    # [win]
 
         # pkg-config (no metadata for vendored libs)
         # a number of dependencies do not have pkgconfig files on windows. e.g. re2
-        {% for each_lib in core_libs %}
-        - pkg-config --print-errors --exact-version "{{ core_version }}" {{ each_lib }} # [not win]
-        {% endfor %}
-        {% for each_lib in core_cpp_libs %}
-        - pkg-config --print-errors --exact-version "{{ version }}" {{ each_lib }} # [not win]
-        {% endfor %}
+        - pkg-config --print-errors --exact-version "{{ core_version }}" gpr     # [not win]
+        - pkg-config --print-errors --exact-version "{{ core_version }}" grpc    # [not win]
+        - pkg-config --print-errors --exact-version "{{ version }}" grpc++       # [not win]
 
         # CMake test: compile upstream example
         - ./test_grpc.sh   # [unix]
@@ -188,7 +200,6 @@ outputs:
         - python -m pip check
         - python grpcio_distribtest.py
         # the following test is flaky on pypy
-        {% if not (aarch64 or ppc64le) or python_impl == "cpython" %}
         # test actual RPC pattern (client & server); other tests did not catch
         # https://github.com/conda-forge/grpc-cpp-feedstock/issues/281
         - cd examples/python/helloworld
@@ -198,7 +209,6 @@ outputs:
         - cp ../../../test_grpcio_helloworld.py .                                # [unix]
         - copy ..\..\..\test_grpcio_helloworld.py .                              # [win]
         - python test_grpcio_helloworld.py
-        {% endif %}
   
   - name: grpcio-tools
     script: build-grpcio-tools.sh  # [not win]

@@ -1,0 +1,139 @@
+From 869ec67659e45d2f100038dcf4f500f036e3039f Mon Sep 17 00:00:00 2001
+From: Sreenithi Sridharan <ssreenithi@google.com>
+Date: Fri, 13 Feb 2026 00:23:55 -0800
+Subject: [PATCH] [Python] Resolve absl::InitializeLog warning (#39779)
+
+Fixes #38703
+
+After Core recently changed its logging system to use absl logging, gRPC python users started seeing the warning log
+`WARNING: All log messages before absl::InitializeLog() is called are written to STDERR.`
+
+This issue especially affects users who are indirect users of the gRPC Python  library too, such as Gemini API users.
+
+`absl::InitializeLog()` is a C++ library that cannot directly be called in the Python layer. It is hence added in the Cython layer at the time of initializing.
+The Python layer so far did not have a dependency on the absl library, hence this PR also adds an external dependency on `absl/log:initialize`
+
+Design gRFC for this: grpc/proposal#505
+
+Closes #39779
+
+COPYBARA_INTEGRATE_REVIEW=https://github.com/grpc/grpc/pull/39779 from sreenithi:absl_init_log_python 59eb1e5102b99889d64757ca7382749e52a16518
+PiperOrigin-RevId: 869586957
+
+Patch adapted from https://github.com/grpc/grpc/pull/41639
+Adaptation include appplying to 1.78.0 and correctly linking to absl/log:initialize
+
+Co-authored-by: Charles Bousseau <cbousseau@anaconda.com>
+
+---
+ src/python/grpcio/grpc/_cython/BUILD.bazel    |  1 +
+ .../grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi  | 18 +++++++++++++
+ .../grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi  | 25 +++++++++++++++++++
+ src/python/grpcio/grpc/_cython/cygrpc.pxd     |  2 ++
+ src/python/grpcio/grpc/_cython/cygrpc.pyx     |  2 +-
+ 5 files changed, 47 insertions(+), 1 deletion(-)
+ create mode 100644 src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi
+ create mode 100644 src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi
+
+diff --git a/src/python/grpcio/grpc/_cython/BUILD.bazel b/src/python/grpcio/grpc/_cython/BUILD.bazel
+index e1ddc02cb1..1899c6554b 100644
+--- a/src/python/grpcio/grpc/_cython/BUILD.bazel
++++ b/src/python/grpcio/grpc/_cython/BUILD.bazel
+@@ -35,5 +35,6 @@ pyx_library(
+     defines = ["GRPC_PYTHON_BUILD=1"],
+     deps = [
+         "//:grpc",
++        "@com_google_absl//absl/log:initialize",
+     ],
+ )
+diff --git a/src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi b/src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi
+new file mode 100644
+index 0000000000..867d27df22
+--- /dev/null
++++ b/src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi
+@@ -0,0 +1,18 @@
++# Copyright 2026 gRPC authors.
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++# absl Utilities
++
++cdef extern from "absl/log/initialize.h" namespace "absl":
++  void InitializeLog() nogil
+diff --git a/src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi b/src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi
+new file mode 100644
+index 0000000000..fe60e17c71
+--- /dev/null
++++ b/src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi
+@@ -0,0 +1,25 @@
++# Copyright 2026 gRPC authors.
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#     http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++
++cdef bint _disable_absl_init_log = os.environ.get("GRPC_PYTHON_DISABLE_ABSL_INIT_LOG", "") in {"1", "t", "true", "y", "yes"}
++
++#
++# initialize absl
++#
++cdef _initialize_absl():
++  if not _disable_absl_init_log:
++    InitializeLog()
++
++_initialize_absl()
+diff --git a/src/python/grpcio/grpc/_cython/cygrpc.pxd b/src/python/grpcio/grpc/_cython/cygrpc.pxd
+index ed04119143..c894dedd8e 100644
+--- a/src/python/grpcio/grpc/_cython/cygrpc.pxd
++++ b/src/python/grpcio/grpc/_cython/cygrpc.pxd
+@@ -17,6 +17,8 @@ cimport cpython
+ 
+ include "_cygrpc/grpc.pxi"
+ 
++include "_cygrpc/absl.pxd.pxi"
++
+ include "_cygrpc/arguments.pxd.pxi"
+ include "_cygrpc/call.pxd.pxi"
+ include "_cygrpc/channel.pxd.pxi"
+diff --git a/src/python/grpcio/grpc/_cython/cygrpc.pyx b/src/python/grpcio/grpc/_cython/cygrpc.pyx
+index 3b6ae92811..64e7c12b9a 100644
+--- a/src/python/grpcio/grpc/_cython/cygrpc.pyx
++++ b/src/python/grpcio/grpc/_cython/cygrpc.pyx
+@@ -37,6 +37,7 @@ _LOGGER = logging.getLogger(__name__)
+ # TODO(atash): figure out why the coverage tool gets confused about the Cython
+ # coverage plugin when the following files don't have a '.pxi' suffix.
+ include "_cygrpc/grpc_string.pyx.pxi"
++include "_cygrpc/absl.pyx.pxi"
+ include "_cygrpc/arguments.pyx.pxi"
+ include "_cygrpc/call.pyx.pxi"
+ include "_cygrpc/channel.pyx.pxi"
+@@ -76,7 +77,6 @@ include "_cygrpc/aio/call.pyx.pxi"
+ include "_cygrpc/aio/channel.pyx.pxi"
+ include "_cygrpc/aio/server.pyx.pxi"
+ 
+-
+ #
+ # initialize gRPC
+ #
+-- 
+2.50.1 (Apple Git-155)
+
