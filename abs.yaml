@@ -1,6 +1,0 @@
-channels:
-  # python protobuf 7.35.1 (not yet on pkgs/main; libprotobuf already is)
-  - https://staging.continuum.io/pbp/fs/protobuf-feedstock/pr30/5ca20af
-
-build_env_vars:
-  ANACONDA_ROCKET_ENABLE_PY314 : yes
