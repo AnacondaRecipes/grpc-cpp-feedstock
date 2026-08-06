@@ -1,9 +1,9 @@
-{% set version = "1.78.0" %}
+{% set version = "1.82.1" %}
 
 # core package & vendored libs use different version scheme than CPP libs, see
 # top of https://github.com/grpc/grpc/blob/v{{ version }}/CMakeLists.txt
-# the difference of 26 is empirical, last changed in 1.78
-{% set core_major = version.split(".")[1] | int - 26 %}
+# the difference of 27 is empirical, last changed in 1.80
+{% set core_major = version.split(".")[1] | int - 27 %}
 {% set core_version = core_major | string ~ ".0.0" %}
 
 package:
@@ -12,7 +12,7 @@ package:
 
 source:
   url: https://github.com/grpc/grpc/archive/v{{ version.replace(".pre", "-pre") }}.tar.gz
-  sha256: e2ace790a5f2d0f83259d1390a816a33b013ea34df2e86084d927e58daa4c5d9
+  sha256: d74186d8fa221cc7f07ec2db970098302559f73612f6cf340cfe754848c4fc29
   patches:
     - patches/0001-windows-ssl-lib-names.patch
     - patches/0002-fix-win-setup-cmds.patch
@@ -39,14 +39,14 @@ source:
     - patches/0013-update-GRPC_DLL-instances-where-necessary.patch
     - patches/0014-use-protobuf-s-libutf8_range.patch
     - patches/0015-disable-grpc-_unsecure.patch
-    # backport https://github.com/grpc/grpc/pull/41639
-    - patches/0016-resolve-absl-initializelog-warning.patch
     # backport https://github.com/grpc/grpc/pull/41909
-    - patches/0017-break-out-_initialize_absl-into-separate-cython-modu.patch
-    # backport https://github.com/grpc/grpc/pull/41910
-    - patches/0018-fix-double-metric-registration-across-shared-librari.patch
+    - patches/0016-break-out-_initialize_absl-into-separate-cython-modu.patch
+    # silence absl::MutexLock(Mutex*) deprecation warnings on newer abseil
+    - patches/0017-silence-absl-MutexLock-pointer-deprecation-warnings.patch
+    # silence absl::Mutex::Lock()/Unlock() deprecation warnings on newer abseil
+    - patches/0018-silence-absl-Mutex-Lock-Unlock-deprecation-warnings.patch
 build:
-  number: 1
+  number: 0
 
 outputs:
   - name: libgrpc
@@ -66,12 +66,12 @@ outputs:
         # for analysing total number of symbols in grpc.dll
         - py-lief       # [win]
       host:
-        - libabseil {{ libabseil }}
+        - libabseil 20260526.0
         - c-ares 1.19.1
-        - libprotobuf {{ libprotobuf }}
-        - re2 {{ re2 }}
-        - openssl {{ openssl }}
-        - zlib {{ zlib }}
+        - libprotobuf 7.35.1
+        - re2 {{ re2 }}.*
+        - openssl {{ openssl }}.*
+        - zlib {{ zlib }}.*
       run_constrained:
         # make sure we don't co-install with old version of previous package name
         - grpc-cpp ={{ version }}
@@ -85,7 +85,7 @@ outputs:
         - cmake
         - ninja-base
         - pkg-config
-        - re2 {{ re2 }}
+        - re2 {{ re2 }}.*
       files:
         - cmake_test/
         - hello.proto
@@ -168,7 +168,7 @@ outputs:
         - pip
         - setuptools
         - cython
-        - libabseil {{ libabseil }}
+        - libabseil 20260526.0
         - {{ pin_subpackage('libgrpc', exact=True) }}
         - pthread-stubs  0.3                     # [linux]
       run:
@@ -225,13 +225,13 @@ outputs:
         - cython
         - pip
         - setuptools
-        - libabseil {{ libabseil }}
-        - libprotobuf {{ libprotobuf }}
+        - libabseil 20260526.0
+        - libprotobuf 7.35.1
       run:
         - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
         - python
         - setuptools
-        - protobuf >=6.33.5,<7.0.0
+        - protobuf >=7.35.1,<8.0.0
     test:
       requires:
         - pip
