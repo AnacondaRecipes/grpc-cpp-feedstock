@@ -14,20 +14,19 @@ Subject: [PATCH 16/18] break out _initialize_absl into separate cython module
  rename src/python/grpcio/grpc/_cython/{_cygrpc/absl.pxd.pxi => cygrpc_absl_init.pxd} (100%)
  rename src/python/grpcio/grpc/_cython/{_cygrpc/absl.pyx.pxi => cygrpc_absl_init.pyx} (98%)
 
-Index: grpc-1.82.1/setup.py
-===================================================================
---- grpc-1.82.1.orig/setup.py
-+++ grpc-1.82.1/setup.py
-@@ -299,6 +299,8 @@ if EXTRA_ENV_LINK_ARGS is None:
- # missing when compiled using package managers like Conda.
+diff --git c/setup.py i/setup.py
+index f6e1716..8f2bd6c 100644
+--- c/setup.py
++++ i/setup.py
+@@ -308,6 +308,7 @@ if EXTRA_ENV_LINK_ARGS is None:
  if "darwin" in sys.platform:
      EXTRA_ENV_LINK_ARGS += " -framework CoreFoundation"
-+    EXTRA_ENV_LINK_ARGS += " -Wl,-exported_symbol,_PyInit_cygrpc"
+     EXTRA_ENV_LINK_ARGS += " -Wl,-exported_symbol,_PyInit_cygrpc"
 +    EXTRA_ENV_LINK_ARGS += " -Wl,-exported_symbol,_PyInit_cygrpc_absl_init"
  
  EXTRA_COMPILE_ARGS = shlex.split(EXTRA_ENV_COMPILE_ARGS)
  EXTRA_LINK_ARGS = shlex.split(EXTRA_ENV_LINK_ARGS)
-@@ -308,7 +310,7 @@ if BUILD_WITH_STATIC_LIBSTDCXX:
+@@ -317,7 +318,7 @@ if BUILD_WITH_STATIC_LIBSTDCXX:
  
  CYTHON_EXTENSION_PACKAGE_NAMES = ()
  
@@ -36,7 +35,7 @@ Index: grpc-1.82.1/setup.py
  
  GRPCIO_CC_SRCS = ()
  
-@@ -534,6 +536,7 @@ def cython_extensions_and_necessity():
+@@ -539,6 +540,7 @@ def cython_extensions_and_necessity():
                  + core_c_files
                  + asm_files
              ),
@@ -44,10 +43,10 @@ Index: grpc-1.82.1/setup.py
              include_dirs=list(EXTENSION_INCLUDE_DIRECTORIES),
              libraries=list(EXTENSION_LIBRARIES),
              define_macros=list(DEFINE_MACROS),
-Index: grpc-1.82.1/src/python/grpcio/grpc/__init__.py
-===================================================================
---- grpc-1.82.1.orig/src/python/grpcio/grpc/__init__.py
-+++ grpc-1.82.1/src/python/grpcio/grpc/__init__.py
+diff --git c/src/python/grpcio/grpc/__init__.py i/src/python/grpcio/grpc/__init__.py
+index efee8bc..3d872c7 100644
+--- c/src/python/grpcio/grpc/__init__.py
++++ i/src/python/grpcio/grpc/__init__.py
 @@ -21,6 +21,9 @@ import sys
  import typing
  from typing import Any, Protocol
@@ -58,10 +57,10 @@ Index: grpc-1.82.1/src/python/grpcio/grpc/__init__.py
  from grpc import _compression
  from grpc._cython import cygrpc as _cygrpc
  from grpc._runtime_protos import protos
-Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc.pxd
-===================================================================
---- grpc-1.82.1.orig/src/python/grpcio/grpc/_cython/cygrpc.pxd
-+++ grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc.pxd
+diff --git c/src/python/grpcio/grpc/_cython/cygrpc.pxd i/src/python/grpcio/grpc/_cython/cygrpc.pxd
+index 2cf29d0..38d5500 100644
+--- c/src/python/grpcio/grpc/_cython/cygrpc.pxd
++++ i/src/python/grpcio/grpc/_cython/cygrpc.pxd
 @@ -17,8 +17,6 @@ cimport cpython
  
  include "_cygrpc/grpc.pxi"
@@ -71,10 +70,10 @@ Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc.pxd
  include "_cygrpc/arguments.pxd.pxi"
  include "_cygrpc/call.pxd.pxi"
  include "_cygrpc/channel.pxd.pxi"
-Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc.pyx
-===================================================================
---- grpc-1.82.1.orig/src/python/grpcio/grpc/_cython/cygrpc.pyx
-+++ grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc.pyx
+diff --git c/src/python/grpcio/grpc/_cython/cygrpc.pyx i/src/python/grpcio/grpc/_cython/cygrpc.pyx
+index b3acae4..79cd0f8 100644
+--- c/src/python/grpcio/grpc/_cython/cygrpc.pyx
++++ i/src/python/grpcio/grpc/_cython/cygrpc.pyx
 @@ -37,7 +37,6 @@ _LOGGER = logging.getLogger(__name__)
  # TODO(atash): figure out why the coverage tool gets confused about the Cython
  # coverage plugin when the following files don't have a '.pxi' suffix.
@@ -83,136 +82,24 @@ Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc.pyx
  include "_cygrpc/arguments.pyx.pxi"
  include "_cygrpc/call.pyx.pxi"
  include "_cygrpc/channel.pyx.pxi"
-Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi
-===================================================================
---- grpc-1.82.1.orig/src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi
-+++ /dev/null
-@@ -1,28 +0,0 @@
--# Copyright 2026 gRPC authors.
--#
--# Licensed under the Apache License, Version 2.0 (the "License");
--# you may not use this file except in compliance with the License.
--# You may obtain a copy of the License at
--#
--#     http://www.apache.org/licenses/LICENSE-2.0
--#
--# Unless required by applicable law or agreed to in writing, software
--# distributed under the License is distributed on an "AS IS" BASIS,
--# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
--# See the License for the specific language governing permissions and
--# limitations under the License.
--
--
--cdef bint _disable_absl_init_log = os.environ.get("GRPC_PYTHON_DISABLE_ABSL_INIT_LOG", "") in {"1", "t", "true", "y", "yes"}
--
--#
--# initialize absl
--#
--cdef _initialize_absl():
--  if _disable_absl_init_log:
--    return
--
--  SetStderrThreshold(LogSeverityAtLeast.kInfo)
--  InitializeLog()
--
--_initialize_absl()
-Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc_absl_init.pyx
-===================================================================
---- /dev/null
-+++ grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc_absl_init.pyx
-@@ -0,0 +1,29 @@
-+# Copyright 2026 gRPC authors.
-+#
-+# Licensed under the Apache License, Version 2.0 (the "License");
-+# you may not use this file except in compliance with the License.
-+# You may obtain a copy of the License at
-+#
-+#     http://www.apache.org/licenses/LICENSE-2.0
-+#
-+# Unless required by applicable law or agreed to in writing, software
-+# distributed under the License is distributed on an "AS IS" BASIS,
-+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+# See the License for the specific language governing permissions and
-+# limitations under the License.
-+
+diff --git c/src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi i/src/python/grpcio/grpc/_cython/cygrpc_absl_init.pxd
+similarity index 100%
+rename from src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi
+rename to src/python/grpcio/grpc/_cython/cygrpc_absl_init.pxd
+diff --git c/src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi i/src/python/grpcio/grpc/_cython/cygrpc_absl_init.pyx
+similarity index 98%
+rename from src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi
+rename to src/python/grpcio/grpc/_cython/cygrpc_absl_init.pyx
+index f38a8f5..859bd06 100644
+--- c/src/python/grpcio/grpc/_cython/_cygrpc/absl.pyx.pxi
++++ i/src/python/grpcio/grpc/_cython/cygrpc_absl_init.pyx
+@@ -12,6 +12,7 @@
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+ 
 +import os
-+
-+cdef bint _disable_absl_init_log = os.environ.get("GRPC_PYTHON_DISABLE_ABSL_INIT_LOG", "") in {"1", "t", "true", "y", "yes"}
-+
-+#
-+# initialize absl
-+#
-+cdef _initialize_absl():
-+  if _disable_absl_init_log:
-+    return
-+
-+  SetStderrThreshold(LogSeverityAtLeast.kInfo)
-+  InitializeLog()
-+
-+_initialize_absl()
-Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi
-===================================================================
---- grpc-1.82.1.orig/src/python/grpcio/grpc/_cython/_cygrpc/absl.pxd.pxi
-+++ /dev/null
-@@ -1,28 +0,0 @@
--# Copyright 2026 gRPC authors.
--#
--# Licensed under the Apache License, Version 2.0 (the "License");
--# you may not use this file except in compliance with the License.
--# You may obtain a copy of the License at
--#
--#     http://www.apache.org/licenses/LICENSE-2.0
--#
--# Unless required by applicable law or agreed to in writing, software
--# distributed under the License is distributed on an "AS IS" BASIS,
--# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
--# See the License for the specific language governing permissions and
--# limitations under the License.
--
--# absl Utilities
--
--cdef extern from "absl/log/initialize.h" namespace "absl":
--  void InitializeLog() nogil
--
--cdef extern from "absl/base/log_severity.h" namespace "absl":
--  cpdef enum class LogSeverityAtLeast(int):
--    kInfo = 0
--    kWarning = 1
--    kError = 2
--    kFatal = 3
--
--cdef extern from "absl/log/globals.h" namespace "absl":
--  void SetStderrThreshold(LogSeverityAtLeast threshold) nogil
-Index: grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc_absl_init.pxd
-===================================================================
---- /dev/null
-+++ grpc-1.82.1/src/python/grpcio/grpc/_cython/cygrpc_absl_init.pxd
-@@ -0,0 +1,28 @@
-+# Copyright 2026 gRPC authors.
-+#
-+# Licensed under the Apache License, Version 2.0 (the "License");
-+# you may not use this file except in compliance with the License.
-+# You may obtain a copy of the License at
-+#
-+#     http://www.apache.org/licenses/LICENSE-2.0
-+#
-+# Unless required by applicable law or agreed to in writing, software
-+# distributed under the License is distributed on an "AS IS" BASIS,
-+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+# See the License for the specific language governing permissions and
-+# limitations under the License.
-+
-+# absl Utilities
-+
-+cdef extern from "absl/log/initialize.h" namespace "absl":
-+  void InitializeLog() nogil
-+
-+cdef extern from "absl/base/log_severity.h" namespace "absl":
-+  cpdef enum class LogSeverityAtLeast(int):
-+    kInfo = 0
-+    kWarning = 1
-+    kError = 2
-+    kFatal = 3
-+
-+cdef extern from "absl/log/globals.h" namespace "absl":
-+  void SetStderrThreshold(LogSeverityAtLeast threshold) nogil
+ 
+ cdef bint _disable_absl_init_log = os.environ.get("GRPC_PYTHON_DISABLE_ABSL_INIT_LOG", "") in {"1", "t", "true", "y", "yes"}
+ 
+-- 
+2.55.0
