@@ -210,6 +210,8 @@ outputs:
         - grpcio ={{ version }}=*_{{ PKG_BUILDNUM }}
         - python
         - protobuf
+        # grpcio-tools 1.71.2 requires setuptools, which is not installed
+        - setuptools  # [py>=314]
     test:
       requires:
         - pip
