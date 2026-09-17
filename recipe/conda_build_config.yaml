@@ -2,8 +2,3 @@ cxx_compiler:              # [win]
   - vs2019                 # [win]
 c_compiler:                # [win]
   - vs2019                 # [win]
-
-c_compiler_version:
-  - 17
-cxx_compiler_version:
-  - 17
