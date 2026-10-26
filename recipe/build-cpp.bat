@@ -2,13 +2,13 @@
 
 echo %CFLAGS%
 echo %CXXFLAGS%
-
 :: copy a necessary helper to source directory
-copy %RECIPE_DIR%\generate_def.py %SRC_DIR%\generate_def.py
+copy %RECIPE_DIR%\generate_def.py %SRC_DIR%\grpc-source\generate_def.py
+cd grpc-source
+
 
 mkdir build-cpp
 cd build-cpp
-
 cmake -GNinja ^
       -DBUILD_SHARED_LIBS=ON ^
       -DCMAKE_CXX_STANDARD=17 ^

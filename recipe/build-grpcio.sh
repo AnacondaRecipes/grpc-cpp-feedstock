@@ -26,6 +26,7 @@ fi
 ln -sf "$(which $CC)" "$SRC_DIR/cc"
 export PATH="$SRC_DIR:$PATH"
 export DYLD_LIBRARY_PATH="${PREFIX}/lib:${DYLD_LIBRARY_PATH}"
-CXXFLAGS="${CXXFLAGS} -DNDEBUG"
+export CXXFLAGS="${CXXFLAGS} -DNDEBUG"
+cd grpc-source
 
 $PYTHON -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -v

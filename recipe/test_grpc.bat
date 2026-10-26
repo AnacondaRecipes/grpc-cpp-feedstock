@@ -8,7 +8,7 @@ if not exist hello.grpc.pb.h exit 1
 if not exist hello.grpc.pb.cc exit 1
 
 :: taken from cd examples/cpp/helloworld
-cd examples/cpp/helloworld
+cd grpc-source/examples/cpp/helloworld
 
 :: folder already contains a file called BUILD
 mkdir build-cpp
