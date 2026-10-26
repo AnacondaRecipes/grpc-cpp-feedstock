@@ -1,0 +1,76 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a6b8b410b6..d34edc421a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3394,6 +3394,7 @@ target_link_libraries(grpc_test_util
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   absl::failure_signal_handler
+   absl::stacktrace
++  absl::statusor
+   absl::symbolize
+   absl::log_initialize
+   grpc
+@@ -3469,6 +3470,7 @@ target_link_libraries(grpc_test_util_unsecure
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   absl::failure_signal_handler
+   absl::stacktrace
++  absl::statusor
+   absl::symbolize
+   absl::log_initialize
+   grpc_unsecure
+@@ -8821,6 +8823,7 @@ target_include_directories(authorization_matchers_test
+ )
+ 
+ target_link_libraries(authorization_matchers_test
++  ${_gRPC_RE2_LIBRARIES}
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   gtest
+   grpc_test_util
+@@ -20180,6 +20183,7 @@ target_include_directories(grpc_authorization_engine_test
+ )
+ 
+ target_link_libraries(grpc_authorization_engine_test
++  ${_gRPC_RE2_LIBRARIES}
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   gtest
+   grpc_test_util
+@@ -22536,6 +22540,7 @@ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+   )
+ 
+   target_link_libraries(httpcli_test
++    ${_gRPC_CARES_LIBRARIES}
+     ${_gRPC_ALLTARGETS_LIBRARIES}
+     gtest
+     grpc++_test_util
+@@ -25840,6 +25845,7 @@ target_include_directories(matchers_test
+ )
+ 
+ target_link_libraries(matchers_test
++  ${_gRPC_RE2_LIBRARIES}
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   gtest
+   grpc_test_util
+@@ -43367,6 +43373,7 @@ target_include_directories(xds_common_types_test
+ )
+ 
+ target_link_libraries(xds_common_types_test
++  ${_gRPC_RE2_LIBRARIES}
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   gtest
+   absl::fixed_array
+@@ -44599,6 +44606,7 @@ target_include_directories(xds_credentials_test
+ )
+ 
+ target_link_libraries(xds_credentials_test
++  ${_gRPC_RE2_LIBRARIES}
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   gtest
+   grpc_test_util
+@@ -50382,6 +50390,7 @@ target_include_directories(xds_listener_resource_type_test
+ )
+ 
+ target_link_libraries(xds_listener_resource_type_test
++  ${_gRPC_RE2_LIBRARIES}
+   ${_gRPC_ALLTARGETS_LIBRARIES}
+   gtest
+   absl::fixed_array
