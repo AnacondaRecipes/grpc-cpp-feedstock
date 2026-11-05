@@ -1,0 +1,158 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a6b8b410b6..6d36148c61 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3404,7 +3404,7 @@ endif()
+ 
+ 
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ 
+ add_library(grpc_test_util_unsecure
+   test/core/event_engine/test_init.cc
+@@ -3480,6 +3480,7 @@ endif()
+ 
+ endif()
+ 
++if(False)
+ add_library(grpc_unsecure
+   src/core/call/call_arena_allocator.cc
+   src/core/call/call_filters.cc
+@@ -3996,6 +3997,7 @@ target_link_libraries(grpc_unsecure
+ if(_gRPC_PLATFORM_IOS OR _gRPC_PLATFORM_MAC)
+   target_link_libraries(grpc_unsecure "-framework CoreFoundation")
+ endif()
++endif()
+ 
+ foreach(_hdr
+   include/grpc/byte_buffer.h
+@@ -4056,7 +4058,7 @@ foreach(_hdr
+ endforeach()
+ 
+ 
+-if(gRPC_INSTALL)
++if(FALSE)
+   install(TARGETS grpc_unsecure EXPORT gRPCTargets
+     RUNTIME DESTINATION ${gRPC_INSTALL_BINDIR}
+     BUNDLE DESTINATION  ${gRPC_INSTALL_BINDIR}
+@@ -5767,6 +5769,7 @@ target_link_libraries(grpc++_test_util
+ 
+ endif()
+ 
++if(FALSE)
+ add_library(grpc++_unsecure
+   src/core/client_channel/virtual_channel.cc
+   src/cpp/client/call_context_registry.cc
+@@ -5869,6 +5872,7 @@ target_link_libraries(grpc++_unsecure
+   grpc_unsecure
+   ${_gRPC_PROTOBUF_LIBRARIES}
+ )
++endif()
+ 
+ foreach(_hdr
+   include/grpc++/alarm.h
+@@ -6090,7 +6094,7 @@ foreach(_hdr
+ endforeach()
+ 
+ 
+-if(gRPC_INSTALL)
++if(FALSE)
+   install(TARGETS grpc++_unsecure EXPORT gRPCTargets
+     RUNTIME DESTINATION ${gRPC_INSTALL_BINDIR}
+     BUNDLE DESTINATION  ${gRPC_INSTALL_BINDIR}
+@@ -7053,7 +7057,7 @@ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+ endif()
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+   add_executable(address_sorting_test_unsecure
+@@ -7686,7 +7690,7 @@ target_link_libraries(admin_services_end2end_test
+ 
+ 
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+   add_executable(alarm_test
+@@ -18698,7 +18702,7 @@ target_link_libraries(filter_fusion_test
+ 
+ 
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ 
+ add_executable(filter_test_v2_test
+   ${_gRPC_PROTO_GENS_DIR}/test/core/event_engine/fuzzing_event_engine/fuzzing_event_engine.pb.cc
+@@ -27866,7 +27870,7 @@ target_link_libraries(parser_test
+ 
+ 
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+   add_executable(party_mpsc_test
+@@ -27911,7 +27915,7 @@ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+ endif()
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ 
+ add_executable(party_test
+   test/core/promise/party_test.cc
+@@ -32482,7 +32486,7 @@ target_link_libraries(server_builder_plugin_test
+ 
+ 
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+   add_executable(server_builder_test
+@@ -32558,7 +32562,7 @@ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+ endif()
+ endif()
+-if(gRPC_BUILD_TESTS)
++if(FALSE)
+ if(_gRPC_PLATFORM_LINUX OR _gRPC_PLATFORM_MAC OR _gRPC_PLATFORM_POSIX)
+ 
+   add_executable(server_builder_with_socket_mutator_test
+@@ -57564,6 +57568,7 @@ generate_pkgconfig(
+   "-laddress_sorting -lupb_textformat_lib -lupb_json_lib -lupb_reflection_lib -lupb_wire_lib -lupb_message_lib -lutf8_range_lib -lupb_descriptor_lib -lupb_mini_descriptor_lib -lupb_mini_table_lib -lupb_hash_lib -lupb_mem_lib -lupb_base_lib -lupb_lex_lib"
+   "grpc.pc")
+ 
++if(FALSE)
+ # grpc_unsecure .pc file
+ generate_pkgconfig(
+   "gRPC unsecure"
+@@ -57574,6 +57579,7 @@ generate_pkgconfig(
+   "-lgrpc_unsecure"
+   "-laddress_sorting -lupb_textformat_lib -lupb_reflection_lib -lupb_wire_lib -lupb_message_lib -lutf8_range_lib -lupb_descriptor_lib -lupb_mini_descriptor_lib -lupb_mini_table_lib -lupb_hash_lib -lupb_mem_lib -lupb_base_lib -lupb_lex_lib"
+   "grpc_unsecure.pc")
++  endif()
+ 
+ # grpc++ .pc file
+ generate_pkgconfig(
+@@ -57586,6 +57592,7 @@ generate_pkgconfig(
+   "-laddress_sorting -lupb_textformat_lib -lupb_json_lib -lupb_reflection_lib -lupb_wire_lib -lupb_message_lib -lutf8_range_lib -lupb_descriptor_lib -lupb_mini_descriptor_lib -lupb_mini_table_lib -lupb_hash_lib -lupb_mem_lib -lupb_base_lib -lupb_lex_lib"
+   "grpc++.pc")
+ 
++if(FALSE)
+ # grpc++_unsecure .pc file
+ generate_pkgconfig(
+   "gRPC++ unsecure"
+@@ -57596,6 +57603,7 @@ generate_pkgconfig(
+   "-lgrpc++_unsecure"
+   "-laddress_sorting -lupb_textformat_lib -lupb_reflection_lib -lupb_wire_lib -lupb_message_lib -lutf8_range_lib -lupb_descriptor_lib -lupb_mini_descriptor_lib -lupb_mini_table_lib -lupb_hash_lib -lupb_mem_lib -lupb_base_lib -lupb_lex_lib"
+   "grpc++_unsecure.pc")
++endif()
+ 
+ if(gRPC_BUILD_GRPCPP_OTEL_PLUGIN)
+   # grpcpp_otel_plugin .pc file
